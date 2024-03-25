@@ -304,3 +304,92 @@ template <template <typename> class Child, typename T>
 T HProd(const Child<T>& c) {
     return c.x * c.y * c.z;
 }
+
+// Forward declarations
+template <typename T> class Point2;
+template <typename T> class Normal2;
+template <typename T> class Point3;
+template <typename T> class Normal3;
+
+// Vector2 ------------------------------------------------------
+template <typename T>
+class Vector2 : public Tuple2<Vector2, T> {
+public:
+    Vector2(T x, T y) : Tuple2<Vector2, T>(x, y) {}
+
+    template <typename U>
+    Vector2(const Tuple2<Vector2, U>& v) : Tuple2<Vector2, T>(T(v.x), T(v.y)) {}
+
+    template <typename U>
+    explicit Vector2(const Point2<U>& p);
+
+    template <typename U>
+    explicit Vector2(const Normal2<U>& n);
+};
+
+template <typename T>
+T LengthSquared(const Vector2<T>& v) {
+    return v.x * v.x + v.y * v.y;
+}
+
+template <typename T>
+Float Length(const Vector2<T>& v) {
+    return std::sqrt(LengthSquared(v));
+}
+
+template <typename T>
+Vector2<T> Normalize(const Vector2<T>& v) {
+    return v / Length(v);
+}
+
+template <typename T>
+T Dot(const Vector2<T>& a, const Vector2<T>& b) {
+    return a.x * b.x + a.y * b.y;
+}
+
+using Vector2f = Vector2<Float>;
+using Vector2i = Vector2<int>;
+
+// Vector3 ------------------------------------------------------
+template <typename T>
+class Vector3 : public Tuple3<Vector3, T> {
+public:
+    Vector3(T x, T y, T z) : Tuple3<Vector3, T>(x, y, z) {}
+
+    template <typename U>
+    Vector3(const Tuple3<Vector3, U>& v) : Tuple3<Vector3, T>(T(v.x), T(v.y), T(v.z)) {}
+
+    template <typename U>
+    explicit Vector3(const Point3<U>& p);
+
+    template <typename U>
+    explicit Vector3(const Normal3<T>& n);
+};
+
+template <typename T>
+T LengthSquared(const Vector3<T>& v) {
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+template <typename T>
+Float Length(const Vector3<T>& v) {
+    return std::sqrt(LengthSquared(v));
+}
+
+template <typename T>
+Vector3<T> Normalize(const Vector3<T>& v) {
+    return v / Length(v);
+}
+
+template <typename T>
+T Dot(const Vector3<T>& a, const Vector3<T>& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+template <typename T>
+Vector3<T> Cross(const Vector3<T>& a, const Vector3<T>& b) {
+    return { a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
+}
+
+using Vector3f = Vector3<Float>;
+using Vector3i = Vector3<int>;
