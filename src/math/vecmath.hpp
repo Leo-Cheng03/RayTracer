@@ -89,62 +89,62 @@ public:
 };
 
 template <template <typename> class Child, typename T>
-Child<T> Abs(const Child<T>& c) {
+Child<T> Abs(const Tuple2<Child, T>& c) {
     return { abs(c.x), abs(c.y) };
 }
 
 template <template <typename> class Child, typename T>
-Child<int> Ceil(const Child<T>& c) {
+Child<int> Ceil(const Tuple2<Child, T>& c) {
     return { ceil(c.x), ceil(c.y) };
 }
 
 template <template <typename> class Child, typename T>
-Child<int> Floor(const Child<T>& c) {
+Child<int> Floor(const Tuple2<Child, T>& c) {
     return { floor(c.x), floor(c.y) };
 }
 
 template <template <typename> class Child, typename T>
-Child<float> Lerp(float t, const Child<T>& a, const Child<T>& b) {
+Child<float> Lerp(float t, const Tuple2<Child, T>& a, const Tuple2<Child, T>& b) {
     return (1 - t) * a + t * b;
 }
 
 template <template <typename> class Child, typename T>
-Child<T> Min(const Child<T>& a, const Child<T>& b) {
+Child<T> Min(const Tuple2<Child, T>& a, const Tuple2<Child, T>& b) {
     return { min(a.x, b.x), min(a.y, b.y) };
 }
 
 template <template <typename> class Child, typename T>
-Child<T> Max(const Child<T>& a, const Child<T>& b) {
+Child<T> Max(const Tuple2<Child, T>& a, const Tuple2<Child, T>& b) {
     return { max(a.x, b.x), max(a.y, b.y) };
 }
 
 template <template <typename> class Child, typename T>
-T MinComponentValue(const Child<T>& c) {
+T MinComponentValue(const Tuple2<Child, T>& c) {
     return min(c.x, c.y);
 }
 
 template <template <typename> class Child, typename T>
-T MaxComponentValue(const Child<T>& c) {
+T MaxComponentValue(const Tuple2<Child, T>& c) {
     return max(c.x, c.y);
 }
 
 template <template <typename> class Child, typename T>
-int MinComponentIndex(const Child<T>& c) {
+int MinComponentIndex(const Tuple2<Child, T>& c) {
     return c.x < c.y ? 0 : 1;
 }
 
 template <template <typename> class Child, typename T>
-int MaxComponentIndex(const Child<T>& c) {
+int MaxComponentIndex(const Tuple2<Child, T>& c) {
     return c.x > c.y ? 0 : 1;
 }
 
 template <template <typename> class Child, typename T>
-Child<T> Permute(const Child<T>& c, int permute[]) {
+Child<T> Permute(const Tuple2<Child, T>& c, int permute[]) {
     return { c[permute[0]], c[permute[1]] };
 }
 
 template <template <typename> class Child, typename T>
-T HProd(const Child<T>& c) {
+T HProd(const Tuple2<Child, T>& c) {
     return c.x * c.y;
 }
 
@@ -236,47 +236,47 @@ public:
 };
 
 template <template <typename> class Child, typename T>
-Child<T> Abs(const Child<T>& c) {
+Child<T> Abs(const Tuple3<Child, T>& c) {
     return { abs(c.x), abs(c.y), abs(c.z) };
 }
 
 template <template <typename> class Child, typename T>
-Child<int> Ceil(const Child<T>& c) {
+Child<int> Ceil(const Tuple3<Child, T>& c) {
     return { ceil(c.x), ceil(c.y), ceil(c.z) };
 }
 
 template <template <typename> class Child, typename T>
-Child<int> Floor(const Child<T>& c) {
+Child<int> Floor(const Tuple3<Child, T>& c) {
     return { floor(c.x), floor(c.y), floor(c.z) };
 }
 
 template <template <typename> class Child, typename T>
-Child<float> Lerp(float t, const Child<T>& a, const Child<T>& b) {
+Child<float> Lerp(float t, const Tuple3<Child, T>& a, const Tuple3<Child, T>& b) {
     return (1 - t) * a + t * b;
 }
 
 template <template <typename> class Child, typename T>
-Child<T> Min(const Child<T>& a, const Child<T>& b) {
+Child<T> Min(const Tuple3<Child, T>& a, const Tuple3<Child, T>& b) {
     return { min(a.x, b.x), min(a.y, b.y), min(a.z, b.z) };
 }
 
 template <template <typename> class Child, typename T>
-Child<T> Max(const Child<T>& a, const Child<T>& b) {
+Child<T> Max(const Tuple3<Child, T>& a, const Tuple3<Child, T>& b) {
     return { max(a.x, b.x), max(a.y, b.y), max(a.z, b.z) };
 }
 
 template <template <typename> class Child, typename T>
-T MinComponentValue(const Child<T>& c) {
+T MinComponentValue(const Tuple3<Child, T>& c) {
     return min(c.x, min(c.y, c.z));
 }
 
 template <template <typename> class Child, typename T>
-T MaxComponentValue(const Child<T>& c) {
+T MaxComponentValue(const Tuple3<Child, T>& c) {
     return max(c.x, max(c.y, c.z));
 }
 
 template <template <typename> class Child, typename T>
-int MinComponentIndex(const Child<T>& c) {
+int MinComponentIndex(const Tuple3<Child, T>& c) {
     if (c.x < c.y) {
         if (c.x < c.z) return 0;
         return 2;
@@ -286,7 +286,7 @@ int MinComponentIndex(const Child<T>& c) {
 }
 
 template <template <typename> class Child, typename T>
-int MaxComponentIndex(const Child<T>& c) {
+int MaxComponentIndex(const Tuple3<Child, T>& c) {
     if (c.x > c.y) {
         if (c.x > c.z) return 0;
         return 2;
@@ -296,12 +296,12 @@ int MaxComponentIndex(const Child<T>& c) {
 }
 
 template <template <typename> class Child, typename T>
-Child<T> Permute(const Child<T>& c, int permute[]) {
+Child<T> Permute(const Tuple3<Child, T>& c, int permute[]) {
     return { c[permute[0]], c[permute[1]], c[permute[2]] };
 }
 
 template <template <typename> class Child, typename T>
-T HProd(const Child<T>& c) {
+T HProd(const Tuple3<Child, T>& c) {
     return c.x * c.y * c.z;
 }
 
@@ -322,9 +322,6 @@ public:
 
     template <typename U>
     explicit Vector2(const Point2<U>& p);
-
-    template <typename U>
-    explicit Vector2(const Normal2<U>& n);
 };
 
 template <typename T>
@@ -363,7 +360,7 @@ public:
     explicit Vector3(const Point3<U>& p);
 
     template <typename U>
-    explicit Vector3(const Normal3<T>& n);
+    explicit Vector3(const Normal3<U>& n);
 };
 
 template <typename T>
@@ -398,7 +395,7 @@ using Vector3i = Vector3<int>;
 template <typename T>
 class Point2: public Tuple2<Point2, T> {
 public:
-    Point2(T x, T y) : Tuple2<Poiint2, T>(x, y) {}
+    Point2(T x, T y) : Tuple2<Point2, T>(x, y) {}
 
     template <typename U>
     Point2(const Tuple2<Point2, U>& p) : Tuple2<Point2, T>(T(p.x), T(p.y)) {}
@@ -408,31 +405,31 @@ public:
 
     template <typename U>
     auto operator+(const Vector2<U>& v) const -> Point2<decltype(T() + U())> {
-        return { x + v.x, y + v.y };
+        return { this->x + v.x, this->y + v.y };
     }
 
     template <typename U>
     auto operator-(const Vector2<U>& v) const -> Point2<decltype(T() - U())> {
-        return { x - v.x, y - v.y };
+        return { this->x - v.x, this->y - v.y };
     }
 
     template <typename U>
     auto operator+=(const Vector2<U>& v) -> Point2<T>& {
-        x += v.x;
-        y += v.y;
+        this->x += v.x;
+        this->y += v.y;
         return *this;
     }
 
     template <typename U>
     auto operator-=(const Vector2<U>& v) -> Point2<T>& {
-        x -= v.x;
-        y -= v.y;
+        this->x -= v.x;
+        this->y -= v.y;
         return *this;
     }
 
     template <typename U>
     auto operator-(const Point2<U>& p) const -> Vector2<decltype(T() - U())> {
-        return { x - p.x, y - p.y };
+        return { this->x - p.x, this->y - p.y };
     }
 };
 
@@ -463,33 +460,33 @@ public:
 
     template <typename U>
     auto operator+(const Vector3<U>& v) const -> Point3<decltype(T() + U())> {
-        return { x + v.x, y + v.y, z + v.z };
+        return { this->x + v.x, this->y + v.y, this->z + v.z };
     }
 
     template <typename U>
     auto operator-(const Vector3<U>& v) const -> Point3<decltype(T() - U())> {
-        return { x - v.x, y - v.y, z - v.z };
+        return { this->x - v.x, this->y - v.y, this->z - v.z };
     }
 
     template <typename U>
     auto operator+=(const Vector3<U>& v) -> Point3<T>& {
-        x += v.x;
-        y += v.y;
-        z += v.z;
+        this->x += v.x;
+        this->y += v.y;
+        this->z += v.z;
         return *this;
     }
 
     template <typename U>
     auto operator-=(const Vector3<U>& v) -> Point3<T>& {
-        x -= v.x;
-        y -= v.y;
-        z -= v.z;
+        this->x -= v.x;
+        this->y -= v.y;
+        this->z -= v.z;
         return *this;
     }
 
     template <typename U>
     auto operator-(const Point3<U>& p) const -> Vector3<decltype(T() - U())> {
-        return { x - p.x, y - p.y, z - p.z };
+        return { this->x - p.x, this->y - p.y, this->z - p.z };
     }
 };
 
