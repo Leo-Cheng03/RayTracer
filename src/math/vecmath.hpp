@@ -506,3 +506,50 @@ auto DistanceSquared(const Point3<T>& p1, const Point3<T>& p2) -> T {
 using RGB = Point3<Float>;
 using Point3f = Point3<Float>;
 using Point3i = Point3<int>;
+
+// Normal3 ------------------------------------------------------
+template <typename T>
+class Normal3: public Tuple3<Normal3, T> {
+public:
+    Normal3(T x, T y, T z) : Tuple3<Normal3, T>(x, y, z) {}
+
+    template <typename U>
+    explicit Normal3(const Vector3<U>& v) : Tuple3<Normal3, T>(T(v.x), T(v.y), T(v.z)) {}
+};
+
+template <typename T>
+T LengthSquared(const Normal3<T>& v) {
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+template <typename T>
+Float Length(const Normal3<T>& v) {
+    return std::sqrt(LengthSquared(v));
+}
+
+template <typename T>
+Vector3<T> Normalize(const Normal3<T>& v) {
+    return v / Length(v);
+}
+
+template <typename T>
+T Dot(const Normal3<T>& a, const Normal3<T>& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+template <typename T>
+T Dot(const Normal3<T>& a, const Vector3<T>& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+template <typename T>
+T Dot(const Vector3<T>& a, const Normal3<T>& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+template <typename T>
+Normal3<T> FaceForward(const Normal3<T>& n, const Vector3<T>& v) {
+    return Dot(n, v) < 0 ? -n : n;
+}
+
+using Normal3f = Normal3<Float>;
