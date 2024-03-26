@@ -393,3 +393,116 @@ Vector3<T> Cross(const Vector3<T>& a, const Vector3<T>& b) {
 
 using Vector3f = Vector3<Float>;
 using Vector3i = Vector3<int>;
+
+// Point2 -------------------------------------------------------
+template <typename T>
+class Point2: public Tuple2<Point2, T> {
+public:
+    Point2(T x, T y) : Tuple2<Poiint2, T>(x, y) {}
+
+    template <typename U>
+    Point2(const Tuple2<Point2, U>& p) : Tuple2<Point2, T>(T(p.x), T(p.y)) {}
+
+    template <typename U>
+    explicit Point2(const Vector2<U>& v) : Tuple2<Point2, T>(T(v.x), T(v.y)) {}
+
+    template <typename U>
+    auto operator+(const Vector2<U>& v) const -> Point2<decltype(T() + U())> {
+        return { x + v.x, y + v.y };
+    }
+
+    template <typename U>
+    auto operator-(const Vector2<U>& v) const -> Point2<decltype(T() - U())> {
+        return { x - v.x, y - v.y };
+    }
+
+    template <typename U>
+    auto operator+=(const Vector2<U>& v) -> Point2<T>& {
+        x += v.x;
+        y += v.y;
+        return *this;
+    }
+
+    template <typename U>
+    auto operator-=(const Vector2<U>& v) -> Point2<T>& {
+        x -= v.x;
+        y -= v.y;
+        return *this;
+    }
+
+    template <typename U>
+    auto operator-(const Point2<U>& p) const -> Vector2<decltype(T() - U())> {
+        return { x - p.x, y - p.y };
+    }
+};
+
+template <typename T>
+auto Distance(const Point2<T>& p1, const Point2<T>& p2) -> T {
+    return Length(p1 - p2);
+}
+
+template <typename T>
+auto DistanceSquared(const Point2<T>& p1, const Point2<T>& p2) -> T {
+    return LengthSquared(p1 - p2);
+}
+
+using Point2f = Point2<Float>;
+using Point2i = Point2<int>;
+
+// Point3 -------------------------------------------------------
+template <typename T>
+class Point3: public Tuple3<Point3, T> {
+public:
+    Point3(T x, T y, T z) : Tuple3<Point3, T>(x, y, z) {}
+
+    template <typename U>
+    Point3(const Tuple3<Point3, U>& p) : Tuple3<Point3, T>(T(p.x), T(p.y), T(p.z)) {}
+    
+    template <typename U>
+    explicit Point3(const Vector3<U>& v) : Tuple3<Point3, T>(T(v.x), T(v.y), T(v.z)) {}
+
+    template <typename U>
+    auto operator+(const Vector3<U>& v) const -> Point3<decltype(T() + U())> {
+        return { x + v.x, y + v.y, z + v.z };
+    }
+
+    template <typename U>
+    auto operator-(const Vector3<U>& v) const -> Point3<decltype(T() - U())> {
+        return { x - v.x, y - v.y, z - v.z };
+    }
+
+    template <typename U>
+    auto operator+=(const Vector3<U>& v) -> Point3<T>& {
+        x += v.x;
+        y += v.y;
+        z += v.z;
+        return *this;
+    }
+
+    template <typename U>
+    auto operator-=(const Vector3<U>& v) -> Point3<T>& {
+        x -= v.x;
+        y -= v.y;
+        z -= v.z;
+        return *this;
+    }
+
+    template <typename U>
+    auto operator-(const Point3<U>& p) const -> Vector3<decltype(T() - U())> {
+        return { x - p.x, y - p.y, z - p.z };
+    }
+};
+
+template <typename T>
+auto Distance(const Point3<T>& p1, const Point3<T>& p2) -> T {
+    return Length(p1 - p2);
+}
+
+template <typename T>
+auto DistanceSquared(const Point3<T>& p1, const Point3<T>& p2) -> T {
+    return LengthSquared(p1 - p2);
+}
+
+using RGB = Point3<Float>;
+using Point3f = Point3<Float>;
+using Point3i = Point3<int>;
