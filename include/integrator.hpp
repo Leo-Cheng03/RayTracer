@@ -3,14 +3,14 @@
 
 #include "vecmath.h"
 #include "ray.hpp"
-#include "group.hpp"
+#include "scene_parser.hpp"
 
 class Integrator {
 public:
     Integrator() {}
     ~Integrator() {}
 
-    Vector3f SampleL(Group* scene, Ray ray);
+    Vector3f SampleL(const SceneParser& scene, Ray ray);
 };
 
 #endif
