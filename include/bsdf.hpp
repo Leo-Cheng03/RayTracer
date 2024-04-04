@@ -4,7 +4,10 @@
 #include <vecmath.h>
 
 struct BSDFSample {
-
+    Vector3f f;
+    Vector3f wi;
+    float pdf;
+    float eta;
 };
 
 class BSDF {

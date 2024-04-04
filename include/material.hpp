@@ -6,6 +6,7 @@
 
 #include "ray.hpp"
 #include "hit.hpp"
+#include "bsdf.hpp"
 #include <iostream>
 
 // TODO: Implement Shade function that computes Phong introduced in class.
@@ -40,6 +41,7 @@ protected:
     Vector3f diffuseColor;
     Vector3f specularColor;
     float shininess;
+    BSDF* bsdf;
 };
 
 
