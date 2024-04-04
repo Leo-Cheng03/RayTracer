@@ -20,6 +20,19 @@ bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
     return result;
 }
 
+bool Mesh::intersectP(const Ray &r, float tmin) {
+    for (int triId = 0; triId < (int) t.size(); ++triId) {
+        TriangleIndex& triIndex = t[triId];
+        Triangle triangle(v[triIndex[0]],
+                          v[triIndex[1]], v[triIndex[2]], material);
+        triangle.normal = n[triId];
+        if (triangle.intersectP(r, tmin)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
 
     // Optional: Use tiny obj loader to replace this simple one.

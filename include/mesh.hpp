@@ -26,6 +26,7 @@ public:
     std::vector<TriangleIndex> t;
     std::vector<Vector3f> n;
     bool intersect(const Ray &r, Hit &h, float tmin) override;
+    bool intersectP(const Ray &r, float tmin) override;
 
 private:
 
