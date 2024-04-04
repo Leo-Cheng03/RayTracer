@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -224,6 +225,15 @@ Vector3f& Vector3f::operator *= ( float f )
 	m_elements[ 0 ] *= f;
 	m_elements[ 1 ] *= f;
 	m_elements[ 2 ] *= f;
+	return *this;
+}
+
+Vector3f& Vector3f::operator /= ( float f )
+{
+	assert( f != 0 );
+	m_elements[ 0 ] /= f;
+	m_elements[ 1 ] /= f;
+	m_elements[ 2 ] /= f;
 	return *this;
 }
 

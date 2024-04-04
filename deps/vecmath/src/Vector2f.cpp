@@ -168,6 +168,15 @@ Vector2f& Vector2f::operator *= ( float f )
 	return *this;
 }
 
+Vector2f& Vector2f::operator /= ( float f )
+{
+    assert( f != 0 );
+    float inv = 1.0f / f;
+    m_elements[ 0 ] *= inv;
+    m_elements[ 1 ] *= inv;
+    return *this;
+}
+
 // static
 float Vector2f::dot( const Vector2f& v0, const Vector2f& v1 )
 {
