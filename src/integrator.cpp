@@ -17,8 +17,8 @@ Vector3f Integrator::SampleL(const SceneParser& scene, Ray ray) {
         // Russian roulette
         float survivalRate = 1.0f;
         if (depth > 3) {
-            survivalRate = 0.8f;
-            if (!russianRoulette(survivalRate)) {
+            survivalRate = 0.2f;
+            if (!russianRoulette(1 - survivalRate)) {
                 break;
             }
         }
