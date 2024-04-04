@@ -50,6 +50,33 @@ public:
 		hit.set(t, material, normal);
 		return true;
 	}
+
+	bool intersectP(const Ray& ray, float tmin) override {
+		Vector3f edge1, edge2;
+		Vector3f pvec, tvec, qvec;
+		float det, inv_det, u, v, t;
+
+		edge1 = vertices[1] - vertices[0];
+		edge2 = vertices[2] - vertices[0];
+		pvec = Vector3f::cross(ray.getDirection(), edge2);
+		det = Vector3f::dot(edge1, pvec);
+
+		if (det < 1e-6 && det > -1e-6) return false;
+		
+		inv_det = 1.0 / det;
+		tvec = ray.getOrigin() - vertices[0];
+		u = Vector3f::dot(tvec, pvec) * inv_det;
+		if (u < 0 || u > 1) return false;
+
+		qvec = Vector3f::cross(tvec, edge1);
+		v = Vector3f::dot(ray.getDirection(), qvec) * inv_det;
+		if (v < 0 || u + v > 1) return false;
+
+		t = Vector3f::dot(edge2, qvec) * inv_det;
+		if (t < tmin) return false;
+
+		return true;
+	}
 	Vector3f normal;
 	Vector3f vertices[3];
 protected:

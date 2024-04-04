@@ -36,6 +36,13 @@ public:
         return inter;
     }
 
+    virtual bool intersectP(const Ray& ray, float tmin) {
+        Vector3f trSource = transformPoint(transform, ray.getOrigin());
+        Vector3f trDirection = transformDirection(transform, ray.getDirection());
+        Ray tr(trSource, trDirection);
+        return o->intersectP(tr, tmin);
+    }
+
 protected:
     Object3D *o; //un-transformed object
     Matrix4f transform;

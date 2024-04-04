@@ -38,6 +38,15 @@ public:
         return hit;
     }
 
+    bool intersectP(const Ray& ray, float tmin) override {
+        for (auto obj : objects) {
+            if (obj && obj->intersectP(ray, tmin)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void addObject(int index, Object3D *obj) {
         objects.push_back(obj);
     }

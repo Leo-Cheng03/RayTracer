@@ -51,6 +51,24 @@ public:
         return false;
     }
 
+    bool intersectP(const Ray& ray, float tmin) override {
+        float a = ray.getDirection().squaredLength();
+        float b = 2 * Vector3f::dot(ray.getDirection(), ray.getOrigin() - center);
+        float c = (ray.getOrigin() - center).squaredLength() - radius * radius;
+
+        float delta = b * b - 4 * a * c;
+
+        if (delta < 0) return false;
+
+        float t1 = (-b - sqrt(delta)) / (2 * a);
+
+        if (t1 > tmin) return true;
+
+        float t2 = (-b + sqrt(delta)) / (2 * a);
+
+        return t2 > tmin;
+    }
+
 protected:
     Vector3f center;
     float radius;

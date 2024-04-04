@@ -18,6 +18,7 @@ public:
 
     // Intersect Ray with this object. If hit, store information in hit structure.
     virtual bool intersect(const Ray &r, Hit &h, float tmin) = 0;
+    virtual bool intersectP(const Ray &r, float tmin) = 0;
 protected:
 
     Material *material;
