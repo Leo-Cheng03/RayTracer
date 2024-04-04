@@ -10,6 +10,7 @@ ADD_SUBDIRECTORY(deps/vecmath)
 SET(CW_SOURCES
         src/image.cpp
         src/main.cpp
+        src/integrator.cpp
         src/mesh.cpp
         src/scene_parser.cpp)
 
@@ -28,6 +29,7 @@ SET(CW_INCLUDES
         include/sphere.hpp
         include/transform.hpp
         include/triangle.hpp
+        include/integrator.hpp
         )
 
 SET(CMAKE_CXX_STANDARD 11)
