@@ -57,8 +57,11 @@ int main(int argc, char *argv[]) {
             // }
             Vector3f color = integrator.SampleL(scene, ray);
             image.SetPixel(x, y, color);
+
+            std::cout << "\rProgess: " << (float)(x * scene.getCamera()->getHeight() + y) * 100 / (float)(scene.getCamera()->getWidth() * scene.getCamera()->getHeight()) << "%" << std::flush;
         }
     }
+    std::cout << "\rProgess: 100.00%\n" << std::endl;
 
     image.SaveBMP(outputFile.c_str());
     return 0;
