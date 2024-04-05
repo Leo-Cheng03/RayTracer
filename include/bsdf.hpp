@@ -23,11 +23,11 @@ protected:
 
 class DiffuseBRDF : public BSDF {
 public:
-    DiffuseBRDF(const Vector3f& color) : color(color) {}
+    DiffuseBRDF(const Vector3f& color) : albedo(color) {}
 
     Vector3f f(const Vector3f& wo, const Vector3f& wi) override {
         if (wo.y() <= 0) return Vector3f::ZERO;
-        return color / M_PI;
+        return albedo / M_PI;
     }
 
     BSDFSample Sample_f(const Vector3f& wo) override {
@@ -40,7 +40,7 @@ public:
     }
 
 private:
-    Vector3f color;
+    Vector3f albedo;
 };
 
 #endif

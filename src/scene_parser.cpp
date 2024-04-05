@@ -265,7 +265,7 @@ Material *SceneParser::parseMaterial() {
         }
     }
     auto *answer = new Material(diffuseColor, specularColor, shininess);
-    auto *bsdf = new DiffuseBRDF(Vector3f(1, 1, 1));
+    auto *bsdf = new DiffuseBRDF(diffuseColor);
     answer->setBSDF(bsdf);
     return answer;
 }

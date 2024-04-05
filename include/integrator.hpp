@@ -10,7 +10,7 @@ public:
     Integrator() {}
     ~Integrator() {}
 
-    Vector3f SampleL(const SceneParser& scene, Ray ray);
+    Vector3f SampleL(const SceneParser& scene, const Ray& ray, int depth = 0);
 };
 
 #endif
