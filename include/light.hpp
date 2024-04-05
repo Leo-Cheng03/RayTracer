@@ -51,7 +51,7 @@ public:
     }
 
     bool SampleLi(const Vector3f &p, LightSample &ls) const override {
-        ls.Li = color;
+        ls.Li = color * scale;
         ls.wi = -direction;
         ls.pdf = 1;
         return true;
@@ -83,7 +83,7 @@ public:
     }
 
     bool SampleLi(const Vector3f &p, LightSample &ls) const override {
-        ls.Li = (position - p).squaredLength() * color;
+        ls.Li = (position - p).squaredLength() * color * scale;
         ls.wi = ls.Li.normalized();
         ls.pdf = 1;
         return true;

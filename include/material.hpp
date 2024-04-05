@@ -18,7 +18,9 @@ public:
 
     }
 
-    virtual ~Material() = default;
+    virtual ~Material() {
+        delete bsdf;
+    }
 
     virtual Vector3f getDiffuseColor() const {
         return diffuseColor;
@@ -37,12 +39,19 @@ public:
         return shaded;
     }
 
+    BSDF* getBSDF() {
+        return bsdf;
+    }
+
+    void setBSDF(BSDF* b) {
+        bsdf = b;
+    }
+
 protected:
     Vector3f diffuseColor;
     Vector3f specularColor;
     float shininess;
     BSDF* bsdf;
 };
-
 
 #endif // MATERIAL_H

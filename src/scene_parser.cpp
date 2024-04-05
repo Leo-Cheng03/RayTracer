@@ -240,7 +240,6 @@ void SceneParser::parseMaterials() {
     assert (!strcmp(token, "}"));
 }
 
-
 Material *SceneParser::parseMaterial() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
@@ -266,6 +265,8 @@ Material *SceneParser::parseMaterial() {
         }
     }
     auto *answer = new Material(diffuseColor, specularColor, shininess);
+    auto *bsdf = new DiffuseBRDF(Vector3f(1, 1, 1));
+    answer->setBSDF(bsdf);
     return answer;
 }
 
