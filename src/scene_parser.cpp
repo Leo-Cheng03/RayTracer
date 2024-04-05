@@ -187,8 +187,11 @@ Light *SceneParser::parseDirectionalLight() {
     assert (!strcmp(token, "color"));
     Vector3f color = readVector3f();
     getToken(token);
+    assert (!strcmp(token, "scale"));
+    float scale = readFloat();
+    getToken(token);
     assert (!strcmp(token, "}"));
-    return new DirectionalLight(direction, color);
+    return new DirectionalLight(direction, color, scale);
 }
 
 Light *SceneParser::parsePointLight() {
@@ -202,8 +205,11 @@ Light *SceneParser::parsePointLight() {
     assert (!strcmp(token, "color"));
     Vector3f color = readVector3f();
     getToken(token);
+    assert (!strcmp(token, "scale"));
+    float scale = readFloat();
+    getToken(token);
     assert (!strcmp(token, "}"));
-    return new PointLight(position, color);
+    return new PointLight(position, color, scale);
 }
 // ====================================================================
 // ====================================================================

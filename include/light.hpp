@@ -12,7 +12,7 @@ struct LightSample {
 
 class Light {
 public:
-    Light() = default;
+    Light(float s = 0.0f) : scale(s) {}
 
     virtual ~Light() = default;
 
@@ -24,6 +24,9 @@ public:
     virtual Vector3f L(const Vector3f &p, const Vector3f &n, const Vector2f &uv, const Vector3f &w) {
         return Vector3f::ZERO;
     }
+
+protected:
+    float scale;
 };
 
 
@@ -31,7 +34,7 @@ class DirectionalLight : public Light {
 public:
     DirectionalLight() = delete;
 
-    DirectionalLight(const Vector3f &d, const Vector3f &c) {
+    DirectionalLight(const Vector3f &d, const Vector3f &c, float s = 0.0f) : Light(s) {
         direction = d.normalized();
         color = c;
     }
@@ -55,7 +58,6 @@ public:
     }
 
 private:
-
     Vector3f direction;
     Vector3f color;
 
@@ -65,7 +67,7 @@ class PointLight : public Light {
 public:
     PointLight() = delete;
 
-    PointLight(const Vector3f &p, const Vector3f &c) {
+    PointLight(const Vector3f &p, const Vector3f &c, float s = 0.0f) : Light(s) {
         position = p;
         color = c;
     }

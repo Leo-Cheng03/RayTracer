@@ -12,11 +12,13 @@ Lights {
     numLights 2
     DirectionalLight {
         direction 0.2 -1 -0.4
-	color 0.7 0.7 0.7
+	    color 0.7 0.7 0.7
+        scale 1.0
     }
     DirectionalLight {
         direction -7 -5 -5
-	color 0.3 0.3 0.3
+	    color 0.3 0.3 0.3
+        scale 1.0
     }
 }
 

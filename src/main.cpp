@@ -42,19 +42,6 @@ int main(int argc, char *argv[]) {
             // pixel in your output image.
             Ray ray = scene.getCamera()->generateRay(Vector2f(x, y));
             Group* baseGroup = scene.getGroup();
-            // if (baseGroup->intersect(ray, hit, 0)) {
-            //     Vector3f color = Vector3f::ZERO;
-            //     for (int li = 0; li < scene.getNumLights(); li++) {
-            //         Light* light = scene.getLight(li);
-            //         Vector3f L, lightColor;
-            //         light->getIllumination(ray.pointAtParameter(hit.getT()), L, lightColor);
-            //         color += hit.getMaterial()->Shade(ray, hit, L, lightColor);
-            //     }
-            //     image.SetPixel(x, y, color);
-            // }
-            // else {
-            //     image.SetPixel(x, y, scene.getBackgroundColor());
-            // }
             Vector3f color = integrator.SampleL(scene, ray);
             image.SetPixel(x, y, color);
 
