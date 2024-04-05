@@ -4,6 +4,12 @@
 #include <Vector3f.h>
 #include "object3d.hpp"
 
+struct LightSample {
+    Vector3f Li;
+    Vector3f wi;
+    float pdf;
+};
+
 class Light {
 public:
     Light() = default;
@@ -11,6 +17,13 @@ public:
     virtual ~Light() = default;
 
     virtual void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const = 0;
+
+    virtual bool SampleLi(const Vector3f &p, LightSample &ls) const = 0;
+
+    // Find emitted radiance of area light.
+    virtual Vector3f L(const Vector3f &p, const Vector3f &n, const Vector2f &uv, const Vector3f &w) {
+        return Vector3f::ZERO;
+    }
 };
 
 
@@ -32,6 +45,13 @@ public:
         // direction of the directional light source
         dir = -direction;
         col = color;
+    }
+
+    bool SampleLi(const Vector3f &p, LightSample &ls) const override {
+        ls.Li = color;
+        ls.wi = -direction;
+        ls.pdf = 1;
+        return true;
     }
 
 private:
@@ -58,6 +78,13 @@ public:
         dir = (position - p);
         dir = dir / dir.length();
         col = color;
+    }
+
+    bool SampleLi(const Vector3f &p, LightSample &ls) const override {
+        ls.Li = (position - p).squaredLength() * color;
+        ls.wi = ls.Li.normalized();
+        ls.pdf = 1;
+        return true;
     }
 
 private:
