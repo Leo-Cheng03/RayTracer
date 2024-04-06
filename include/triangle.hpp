@@ -51,7 +51,7 @@ public:
 		return true;
 	}
 
-	bool intersectP(const Ray& ray, float tmin) override {
+	bool intersectP(const Ray& ray, float tmin, float tmax) override {
 		Vector3f edge1, edge2;
 		Vector3f pvec, tvec, qvec;
 		float det, inv_det, u, v, t;
@@ -73,7 +73,7 @@ public:
 		if (v < 0 || u + v > 1) return false;
 
 		t = Vector3f::dot(edge2, qvec) * inv_det;
-		if (t < tmin) return false;
+		if (t < tmin || t >= tmax) return false;
 
 		return true;
 	}

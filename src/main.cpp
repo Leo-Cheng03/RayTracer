@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 
 #include "scene_parser.hpp"
 #include "image.hpp"
@@ -45,6 +46,7 @@ int main(int argc, char *argv[]) {
             Vector3f color = integrator.SampleL(scene, ray);
             image.SetPixel(x, y, color);
 
+            std::cout << std::fixed << std::setprecision(2);
             std::cout << "\rProgess: " << (float)(x * scene.getCamera()->getHeight() + y) * 100 / (float)(scene.getCamera()->getWidth() * scene.getCamera()->getHeight()) << "%" << std::flush;
         }
     }

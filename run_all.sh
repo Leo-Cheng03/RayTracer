@@ -6,6 +6,7 @@ cmake --build build
 # Run all testcases. 
 # You can comment some lines to disable the run of specific examples.
 mkdir -p output
+build/COURSEWORK testcases/cornell_box.txt output/cornell_scene.bmp
 build/COURSEWORK testcases/scene01_basic.txt output/scene01.bmp
 build/COURSEWORK testcases/scene02_cube.txt output/scene02.bmp
 build/COURSEWORK testcases/scene03_sphere.txt output/scene03.bmp

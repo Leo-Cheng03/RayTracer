@@ -20,13 +20,13 @@ bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
     return result;
 }
 
-bool Mesh::intersectP(const Ray &r, float tmin) {
+bool Mesh::intersectP(const Ray &r, float tmin, float tmax) {
     for (int triId = 0; triId < (int) t.size(); ++triId) {
         TriangleIndex& triIndex = t[triId];
         Triangle triangle(v[triIndex[0]],
                           v[triIndex[1]], v[triIndex[2]], material);
         triangle.normal = n[triId];
-        if (triangle.intersectP(r, tmin)) {
+        if (triangle.intersectP(r, tmin, tmax)) {
             return true;
         }
     }

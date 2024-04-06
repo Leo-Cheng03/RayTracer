@@ -29,11 +29,11 @@ public:
         return true;
     }
 
-    bool intersectP(const Ray &r, float tmin) override {
+    bool intersectP(const Ray &r, float tmin, float tmax) override {
         float nd = Vector3f::dot(normal, r.getDirection());
         if (nd == 0) return false;
         float t = (d - Vector3f::dot(normal, r.getOrigin())) / nd;
-        return t >= tmin;
+        return t >= tmin && t <= tmax;
     }
 
 protected:

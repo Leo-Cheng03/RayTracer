@@ -7,6 +7,7 @@
 struct LightSample {
     Vector3f Li;
     Vector3f wi;
+    float distance;
     float pdf;
 };
 
@@ -53,6 +54,7 @@ public:
     bool SampleLi(const Vector3f &p, LightSample &ls) const override {
         ls.Li = color * scale;
         ls.wi = -direction;
+        ls.distance = INFINITY;
         ls.pdf = 1;
         return true;
     }
@@ -84,7 +86,8 @@ public:
 
     bool SampleLi(const Vector3f &p, LightSample &ls) const override {
         ls.Li = color * scale / (position - p).squaredLength();
-        ls.wi = (position - p).normalized();
+        ls.distance = (position - p).length();
+        ls.wi = (position - p) / ls.distance;
         ls.pdf = 1;
         return true;
     }

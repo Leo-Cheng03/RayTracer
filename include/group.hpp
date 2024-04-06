@@ -38,9 +38,9 @@ public:
         return hit;
     }
 
-    bool intersectP(const Ray& ray, float tmin) override {
+    bool intersectP(const Ray& ray, float tmin, float tmax) override {
         for (auto obj : objects) {
-            if (obj && obj->intersectP(ray, tmin)) {
+            if (obj && obj->intersectP(ray, tmin, tmax)) {
                 return true;
             }
         }

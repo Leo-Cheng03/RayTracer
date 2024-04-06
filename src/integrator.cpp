@@ -7,6 +7,16 @@ float russianRoulette(float p) {
     return (float)rand() / RAND_MAX < p;
 }
 
+Vector3f randomDirection() {
+    float abs_x = (float)rand() / RAND_MAX;
+    float abs_y = (float)rand() / RAND_MAX;
+    float abs_z = (float)rand() / RAND_MAX;
+    float x = rand() % 2 == 0 ? abs_x : -abs_x;
+    float y = rand() % 2 == 0 ? abs_y : -abs_y;
+    float z = rand() % 2 == 0 ? abs_z : -abs_z;
+    return Vector3f(x, y, z).normalized();
+}
+
 Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, int depth) {
     if (depth > 10) return Vector3f::ZERO;
 
@@ -15,7 +25,6 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, int depth
     Vector3f finalColor = Vector3f::ZERO;
 
     // Russian roulette
-    // std::cout << "hi" << std::endl;
     float survivalRate = 1.0f;
     if (depth > 3) {
         survivalRate = 0.2f;
@@ -53,15 +62,16 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, int depth
         Ray shadowRay(hitPoint, ls.wi);
         // Check if the new ray intersects with any object in the scene
         Vector3f localWi = worldToNormal * ls.wi;
-        if (ls.pdf != 0 && !primitives->intersectP(shadowRay, 0.001f)) {
+        float tmax = ls.distance;
+        if (ls.pdf != 0 && !primitives->intersectP(shadowRay, 0.001f, tmax)) {
             finalColor += ls.Li * (Vector3f::dot(ls.wi, normal)) / ls.pdf * material->f(localWo, localWi);
         }
         
         // Indirect lighting
-        Vector3f randomDir = Vector3f(rand() % 1000 / 1000.0f, rand() % 1000 / 1000.0f, rand() % 1000 / 1000.0f).normalized();
-        Vector3f localRandomDir = worldToNormal * randomDir;
-        Ray sampleRay(hitPoint + normal * 1e-3, randomDir);
-        finalColor += material->f(localWo, localRandomDir) * SampleL(scene, sampleRay, depth + 1);
+        Vector3f sampleDir = randomDirection();
+        Vector3f localSampleDir = worldToNormal * sampleDir;
+        Ray sampleRay(hitPoint, sampleDir);
+        finalColor += material->f(localWo, localSampleDir) * SampleL(scene, sampleRay, depth + 1);
     }
     else {
         // If it doesn't, account for the background color

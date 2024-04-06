@@ -36,11 +36,11 @@ public:
         return inter;
     }
 
-    virtual bool intersectP(const Ray& ray, float tmin) {
+    virtual bool intersectP(const Ray& ray, float tmin, float tmax) {
         Vector3f trSource = transformPoint(transform, ray.getOrigin());
         Vector3f trDirection = transformDirection(transform, ray.getDirection());
         Ray tr(trSource, trDirection);
-        return o->intersectP(tr, tmin);
+        return o->intersectP(tr, tmin, tmax);
     }
 
 protected:

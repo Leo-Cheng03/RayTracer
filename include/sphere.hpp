@@ -51,7 +51,7 @@ public:
         return false;
     }
 
-    bool intersectP(const Ray& ray, float tmin) override {
+    bool intersectP(const Ray& ray, float tmin, float tmax) override {
         float a = ray.getDirection().squaredLength();
         float b = 2 * Vector3f::dot(ray.getDirection(), ray.getOrigin() - center);
         float c = (ray.getOrigin() - center).squaredLength() - radius * radius;
@@ -62,11 +62,12 @@ public:
 
         float t1 = (-b - sqrt(delta)) / (2 * a);
 
+        if (t1 >= tmax) return false;
         if (t1 > tmin) return true;
 
         float t2 = (-b + sqrt(delta)) / (2 * a);
 
-        return t2 > tmin;
+        return t2 > tmin && t2 < tmax;
     }
 
 protected:
