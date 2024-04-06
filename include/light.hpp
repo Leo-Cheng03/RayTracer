@@ -93,10 +93,53 @@ public:
     }
 
 private:
-
     Vector3f position;
     Vector3f color;
+};
 
+class AreaLight : public Light {
+public:
+    AreaLight() = delete;
+
+    AreaLight(const Vector3f &p, const Vector3f& dir, const Vector3f& up, const Vector2f size, const Vector3f &c, float s = 0.0f) : Light(s) {
+        this->position = p;
+        this->color = c;
+        this->direction = dir.normalized();
+        this->up = (up - Vector3f::dot(up, direction) * direction).normalized();
+        this->right = Vector3f::cross(this->direction, this->up);
+        this->size = size;
+        this->pdf = 1 / (size.x() * size.y());
+    }
+
+    ~AreaLight() override = default;
+
+    void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override {
+        // the direction to the light is the opposite of the
+        // direction of the directional light source
+        dir = (position - p);
+        dir = dir / dir.length();
+        col = color;
+    }
+
+    bool SampleLi(const Vector3f &p, LightSample &ls) const override {
+        Vector2f uv = Vector2f(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX);
+        Vector3f samplePoint = position + (uv.x() - 0.5) * size.x() * right + (uv.y() - 0.5) * size.y() * up;
+
+        ls.distance = (samplePoint - p).length();
+        ls.wi = (samplePoint - p) / ls.distance;
+        ls.Li = color * scale * Vector3f::dot(-ls.wi, direction) / (samplePoint - p).squaredLength();
+        ls.pdf = pdf;
+        return true;
+    }
+
+private:
+    Vector3f position;
+    Vector3f direction;
+    Vector3f up;
+    Vector3f right;
+    Vector2f size;
+    Vector3f color;
+    float pdf;
 };
 
 #endif // LIGHT_H

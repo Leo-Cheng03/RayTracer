@@ -63,6 +63,7 @@ private:
     void parseLights();
     Light *parsePointLight();
     Light *parseDirectionalLight();
+    Light *parseAreaLight();
     void parseMaterials();
     Material *parseMaterial();
     Object3D *parseObject(char token[MAX_PARSER_TOKEN_LENGTH]);
@@ -76,6 +77,7 @@ private:
     int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 
     Vector3f readVector3f();
+    Vector2f readVector2f();
 
     float readFloat();
     int readInt();

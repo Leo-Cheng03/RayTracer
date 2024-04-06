@@ -166,6 +166,8 @@ void SceneParser::parseLights() {
             lights[count] = parseDirectionalLight();
         } else if (strcmp(token, "PointLight") == 0) {
             lights[count] = parsePointLight();
+        } else if (strcmp(token, "AreaLight") == 0) {
+            lights[count] = parseAreaLight();
         } else {
             printf("Unknown token in parseLight: '%s'\n", token);
             exit(0);
@@ -210,6 +212,33 @@ Light *SceneParser::parsePointLight() {
     getToken(token);
     assert (!strcmp(token, "}"));
     return new PointLight(position, color, scale);
+}
+
+Light *SceneParser::parseAreaLight() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    getToken(token);
+    assert (!strcmp(token, "position"));
+    Vector3f position = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "direction"));
+    Vector3f direction = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "up"));
+    Vector3f up = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "size"));
+    Vector2f size = readVector2f();
+    getToken(token);
+    assert (!strcmp(token, "color"));
+    Vector3f color = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "scale"));
+    float scale = readFloat();
+    getToken(token);
+    assert (!strcmp(token, "}"));
+    return new AreaLight(position, direction, up, size, color, scale);
 }
 // ====================================================================
 // ====================================================================
@@ -502,6 +531,16 @@ Vector3f SceneParser::readVector3f() {
         assert (0);
     }
     return Vector3f(x, y, z);
+}
+
+Vector2f SceneParser::readVector2f() {
+    float u, v;
+    int count = fscanf(file, "%f %f", &u, &v);
+    if (count != 2) {
+        printf("Error trying to read 2 floats to make a Vector2f\n");
+        assert (0);
+    }
+    return Vector2f(u, v);
 }
 
 

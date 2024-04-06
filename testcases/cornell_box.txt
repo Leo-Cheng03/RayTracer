@@ -10,10 +10,13 @@ PerspectiveCamera {
 
 Lights {
     numLights 1
-    PointLight {
-        position 0 5 0
+    AreaLight {
+        position 0 7.9 0
+        direction 0 -1 0
+        up 0 0 1
+        size 1 1
         color 1 1 1
-        scale 60
+        scale 300
     }
 }
 
