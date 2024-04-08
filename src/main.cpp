@@ -12,6 +12,7 @@
 #include "group.hpp"
 #include "light.hpp"
 #include "integrator.hpp"
+#include "sampler.hpp"
 
 #include <string>
 
@@ -34,20 +35,28 @@ int main(int argc, char *argv[]) {
     SceneParser scene(inputFile.c_str());
     Image image(scene.getCamera()->getWidth(), scene.getCamera()->getHeight());
     Integrator integrator;
+    StratifiedSampler sampler(2, 2, true);
+    // RandomSampler sampler(4);
     // Then loop over each pixel in the image, shooting a ray
 
-    for (int x = 0; x < scene.getCamera()->getWidth(); x++) {
-        for (int y = 0; y < scene.getCamera()->getHeight(); y++) {
+    for (int y = 0; y < scene.getCamera()->getHeight(); y++) {
+        for (int x = 0; x < scene.getCamera()->getWidth(); x++) {
             // through that pixel and finding its intersection with
             // the scene.  Write the color at the intersection to that
             // pixel in your output image.
-            Ray ray = scene.getCamera()->generateRay(Vector2f(x, y));
-            Group* baseGroup = scene.getGroup();
-            Vector3f color = integrator.SampleL(scene, ray);
-            image.SetPixel(x, y, color);
+            Vector3f color = Vector3f::ZERO;
+            for (int s = 0; s < sampler.SamplesPerPixel(); s++) {
+                sampler.StartPixel(x, y, s);
 
-            std::cout << std::fixed << std::setprecision(2);
-            std::cout << "\rProgess: " << (float)(x * scene.getCamera()->getHeight() + y) * 100 / (float)(scene.getCamera()->getWidth() * scene.getCamera()->getHeight()) << "%" << std::flush;
+                Ray ray = scene.getCamera()->generateRay(Vector2f(x, y) + sampler.Get2D());
+                Group* baseGroup = scene.getGroup();
+                color += integrator.SampleL(scene, ray, sampler);
+
+                std::cout << std::fixed << std::setprecision(2);
+                std::cout << "\rProgess: " << (float)((sampler.SamplesPerPixel()) * (y * scene.getCamera()->getWidth() + x - 1) + s) * 100 / (float)((scene.getCamera()->getWidth() * scene.getCamera()->getHeight()) * sampler.SamplesPerPixel()) << "%" << std::flush;
+            }
+            color /= sampler.SamplesPerPixel();
+            image.SetPixel(x, y, color);
         }
     }
     std::cout << "\rProgess: 100.00%\n" << std::endl;

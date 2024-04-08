@@ -2,6 +2,7 @@
 #include "group.hpp"
 #include "hit.hpp"
 #include "light.hpp"
+#include "sampler.hpp"
 
 float russianRoulette(float p) {
     return (float)rand() / RAND_MAX < p;
@@ -17,7 +18,7 @@ Vector3f randomDirection() {
     return Vector3f(x, y, z).normalized();
 }
 
-Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, int depth) {
+Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& sampler, int depth) {
     if (depth > 10) return Vector3f::ZERO;
 
     Group* primitives = scene.getGroup();
@@ -55,7 +56,9 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, int depth
 
         // Direct lighting
         // Sample a light based on power heuristic
-        Light* light = scene.getLight(rand() % scene.getNumLights());
+        Light* light = scene.getLight(
+            (int)(sampler.Get1D() * scene.getNumLights())
+        );
         LightSample ls;
         light->SampleLi(hitPoint, ls);
         // Create a new ray from the intersection point to the light source
@@ -69,10 +72,10 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, int depth
         }
         
         // Indirect lighting
-        Vector3f sampleDir = randomDirection();
+        Vector3f sampleDir = cosineSampleHemisphere(sampler.Get2D());
         Vector3f localSampleDir = worldToNormal * sampleDir;
         Ray sampleRay(hitPoint, sampleDir);
-        finalColor += material->f(localWo, localSampleDir) * SampleL(scene, sampleRay, depth + 1);
+        finalColor += material->f(localWo, localSampleDir) * SampleL(scene, sampleRay, sampler, depth + 1);
     }
     else {
         // If it doesn't, account for the background color
