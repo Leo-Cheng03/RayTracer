@@ -19,7 +19,7 @@ public:
 
     virtual void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const = 0;
 
-    virtual bool SampleLi(const Vector3f &p, LightSample &ls) const = 0;
+    virtual bool SampleLi(const Vector3f &p, const Vector2f& uv, LightSample &ls) const = 0;
 
     // Find emitted radiance of area light.
     virtual Vector3f L(const Vector3f &p, const Vector3f &n, const Vector2f &uv, const Vector3f &w) {
@@ -51,7 +51,7 @@ public:
         col = color;
     }
 
-    bool SampleLi(const Vector3f &p, LightSample &ls) const override {
+    bool SampleLi(const Vector3f &p, const Vector2f& uv, LightSample &ls) const override {
         ls.Li = color * scale;
         ls.wi = -direction;
         ls.distance = INFINITY;
@@ -84,7 +84,7 @@ public:
         col = color;
     }
 
-    bool SampleLi(const Vector3f &p, LightSample &ls) const override {
+    bool SampleLi(const Vector3f &p, const Vector2f& uv, LightSample &ls) const override {
         ls.Li = color * scale / (position - p).squaredLength();
         ls.distance = (position - p).length();
         ls.wi = (position - p) / ls.distance;
@@ -121,8 +121,7 @@ public:
         col = color;
     }
 
-    bool SampleLi(const Vector3f &p, LightSample &ls) const override {
-        Vector2f uv = Vector2f(rand() / (float)RAND_MAX, rand() / (float)RAND_MAX);
+    bool SampleLi(const Vector3f &p, const Vector2f& uv, LightSample &ls) const override {
         Vector3f samplePoint = position + (uv.x() - 0.5) * size.x() * right + (uv.y() - 0.5) * size.y() * up;
 
         ls.distance = (samplePoint - p).length();

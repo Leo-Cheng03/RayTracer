@@ -60,14 +60,13 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
             (int)(sampler.Get1D() * scene.getNumLights())
         );
         LightSample ls;
-        light->SampleLi(hitPoint, ls);
+        light->SampleLi(hitPoint, sampler.Get2D(), ls);
         // Create a new ray from the intersection point to the light source
         Ray shadowRay(hitPoint, ls.wi);
         // Check if the new ray intersects with any object in the scene
         Vector3f localWi = worldToNormal * ls.wi;
         float tmax = ls.distance;
         if (ls.pdf != 0 && !primitives->intersectP(shadowRay, 0.001f, tmax)) {
-            // finalColor = ls.Li;
             finalColor += ls.Li * (Vector3f::dot(ls.wi, normal)) / ls.pdf * material->f(localWo, localWi);
         }
         
