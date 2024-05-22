@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     SceneParser scene(inputFile.c_str());
     Image image(scene.getCamera()->getWidth(), scene.getCamera()->getHeight());
     Integrator integrator;
-    StratifiedSampler sampler(4, 4, true);
+    StratifiedSampler sampler(2, 2, true);
     // RandomSampler sampler(4);
     // Then loop over each pixel in the image, shooting a ray
 
