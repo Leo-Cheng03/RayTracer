@@ -39,8 +39,8 @@ public:
         return shaded;
     }
 
-    BSDFSample Sample_f(const Vector3f& wo) {
-        return bsdf->Sample_f(wo);
+    BSDFSample Sample_f(const Vector3f& wo, Sampler& sampler) {
+        return bsdf->Sample_f(wo, sampler);
     }
 
     Vector3f f(const Vector3f& wo, const Vector3f& wi) {

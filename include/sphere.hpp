@@ -2,6 +2,8 @@
 #define SPHERE_H
 
 #include "object3d.hpp"
+#include "sampling.hpp"
+#include "material.hpp"
 #include <vecmath.h>
 #include <cmath>
 
@@ -44,7 +46,7 @@ public:
         if (t2 > tmin && t2 < h.getT()) {
             Vector3f normal = r.pointAtParameter(t2) - center;
             normal.normalize();
-            h.set(t1, material, normal);
+            h.set(t2, material, normal);
             return true;
         }
 

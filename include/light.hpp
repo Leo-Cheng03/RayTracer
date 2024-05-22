@@ -1,8 +1,12 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include <Vector3f.h>
+#include "vecmath.h"
 #include "object3d.hpp"
+
+inline float ClampZero(float x) {
+    return x < 0 ? 0 : x ;
+}
 
 struct LightSample {
     Vector3f Li;
@@ -126,7 +130,7 @@ public:
 
         ls.distance = (samplePoint - p).length();
         ls.wi = (samplePoint - p) / ls.distance;
-        ls.Li = color * scale * Vector3f::dot(-ls.wi, direction) / (samplePoint - p).squaredLength();
+        ls.Li = color * scale * ClampZero(Vector3f::dot(-ls.wi, direction)) / (samplePoint - p).squaredLength();
         ls.pdf = pdf;
         return true;
     }

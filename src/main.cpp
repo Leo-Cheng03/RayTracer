@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     SceneParser scene(inputFile.c_str());
     Image image(scene.getCamera()->getWidth(), scene.getCamera()->getHeight());
     Integrator integrator;
-    StratifiedSampler sampler(2, 2, true);
+    StratifiedSampler sampler(4, 4, true);
     // RandomSampler sampler(4);
     // Then loop over each pixel in the image, shooting a ray
 
@@ -50,7 +50,20 @@ int main(int argc, char *argv[]) {
 
                 Ray ray = scene.getCamera()->generateRay(Vector2f(x, y) + sampler.Get2D());
                 Group* baseGroup = scene.getGroup();
-                color += integrator.SampleL(scene, ray, sampler);
+
+                if (x == 107 && y == image.Height() - 198) {
+                    std::cout << std::endl;
+                    color += integrator.SampleL(scene, ray, sampler, true);
+                    std::cout << "Final Color: " << color << std::endl << std::endl;
+
+                    if (s == sampler.SamplesPerPixel() - 1) {
+                        std::cout << "Final Final Color: " << color / sampler.SamplesPerPixel() << std::endl << std::endl;
+                    }
+
+                }
+                else {
+                    color += integrator.SampleL(scene, ray, sampler, false);
+                }
 
                 std::cout << std::fixed << std::setprecision(2);
                 std::cout << "\rProgess: " << (float)((sampler.SamplesPerPixel()) * (y * scene.getCamera()->getWidth() + x - 1) + s) * 100 / (float)((scene.getCamera()->getWidth() * scene.getCamera()->getHeight()) * sampler.SamplesPerPixel()) << "%" << std::flush;

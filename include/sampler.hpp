@@ -131,10 +131,4 @@ private:
     std::uniform_real_distribution<float> distribution;
 };
 
-inline Vector3f cosineSampleHemisphere(Vector2f uv) {
-    float r = sqrt(uv.x());
-    float theta = 2 * M_PI * uv.y();
-    return Vector3f(r * cos(theta), r * sin(theta), sqrt(1 - uv.x()));
-}
-
 #endif

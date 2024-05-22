@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction 0 0 -1
     up 0 1 0
     angle 60
-    width 512
-    height 512
+    width 256
+    height 256
 }
 
 Lights {
@@ -16,23 +16,32 @@ Lights {
         up 0 0 1
         size 1 1
         color 1 1 1
-        scale 300
+        scale 200
     }
 }
 
 Background {
-    color 0.2 0.2 0.2 
+    color 0.0 0.0 0.0 
 }
 
 Materials {
-    numMaterials 3
+    numMaterials 5
     Material { diffuseColor 0.65 0.05 0.05 }
     Material { diffuseColor 0.12 0.45 0.15 }
     Material { diffuseColor 0.73 0.73 0.73 }
+    Material {
+        specular
+        specularColor 1.0 1.0 1.0
+        eta 1.52
+    }
+    Material {
+        specularReflectance
+        specularColor 1.0 1.0 1.0
+    }
 }
 
 Group {
-    numObjects 6
+    numObjects 7
     MaterialIndex 0
     Transform {
         Translate -5 4 0
@@ -73,12 +82,15 @@ Group {
             obj_file mesh/cube.obj
         }
     }
-    MaterialIndex 2
-    Transform {
-        Scale 9 9 9    
-        TriangleMesh {
-            obj_file mesh/bunny_1k.obj
-        }
+    MaterialIndex 3
+    Sphere {
+        center 2 1.25 1
+        radius 1.25
+    }
+    MaterialIndex 4
+    Sphere {
+        center -1 1.25 -1
+        radius 1.25
     }
 }
 
