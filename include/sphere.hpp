@@ -22,7 +22,7 @@ public:
 
     ~Sphere() override = default;
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override {
+    bool intersect(const Ray &r, Hit &h, float tmin) const override {
         float a = r.getDirection().squaredLength();
         float b = 2 * Vector3f::dot(r.getDirection(), r.getOrigin() - center);
         float c = (r.getOrigin() - center).squaredLength() - radius * radius;
@@ -53,7 +53,7 @@ public:
         return false;
     }
 
-    bool intersectP(const Ray& ray, float tmin, float tmax) override {
+    bool intersectP(const Ray& ray, float tmin, float tmax) const override {
         float a = ray.getDirection().squaredLength();
         float b = 2 * Vector3f::dot(ray.getDirection(), ray.getOrigin() - center);
         float c = (ray.getOrigin() - center).squaredLength() - radius * radius;
@@ -70,6 +70,10 @@ public:
         float t2 = (-b + sqrt(delta)) / (2 * a);
 
         return t2 > tmin && t2 < tmax;
+    }
+
+    Bound3f Bounds() const override {
+        return Bound3f(center - Vector3f(radius, radius, radius), center + Vector3f(radius, radius, radius));
     }
 
 protected:

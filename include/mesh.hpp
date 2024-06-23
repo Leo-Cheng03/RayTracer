@@ -6,6 +6,7 @@
 #include "triangle.hpp"
 #include "Vector2f.h"
 #include "Vector3f.h"
+#include "bvh.hpp"
 
 
 class Mesh : public Object3D {
@@ -25,10 +26,13 @@ public:
     std::vector<Vector3f> v;
     std::vector<TriangleIndex> t;
     std::vector<Vector3f> n;
-    bool intersect(const Ray &r, Hit &h, float tmin) override;
-    bool intersectP(const Ray &r, float tmin, float tmax) override;
+    bool intersect(const Ray &r, Hit &h, float tmin) const override;
+    bool intersectP(const Ray &r, float tmin, float tmax) const override;
+    Bound3f Bounds() const override;
 
 private:
+
+    BVH* bvh;
 
     // Normal can be used for light estimation
     void computeNormal();

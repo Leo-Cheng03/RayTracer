@@ -5,8 +5,10 @@
 #include <cmath>
 #include <cfloat>
 
+#include "ray.hpp"
+
 class Bound3f {
-private:
+public:
     Vector3f pMin, pMax;
 
 public:
@@ -157,6 +159,44 @@ public:
 
     static Bound3f Expand(const Bound3f& b, float delta) {
         return Bound3f(b.pMin - Vector3f(delta, delta, delta), b.pMax + Vector3f(delta, delta, delta));
+    }
+
+    bool IntersectP(const Ray& ray, float tmin, float tmax, float* hitt0, float* hitt1) const {
+        float t0 = tmin, t1 = tmax;
+        for (int i = 0; i < 3; i++) {
+            float invRayDir = 1.0f / ray.getDirection()[i];
+            float tNear = (pMin[i] - ray.getOrigin()[i]) * invRayDir;
+            float tFar = (pMax[i] - ray.getOrigin()[i]) * invRayDir;
+
+            if (tNear > tFar) std::swap(tNear, tFar);
+            t0 = tNear > t0 ? tNear : t0;
+            t1 = tFar < t1 ? tFar : t1;
+            if (t0 > t1) return false;
+        }
+        if (hitt0) *hitt0 = t0;
+        if (hitt1) *hitt1 = t1;
+        return true;
+    }
+
+    bool IntersectP(const Ray& ray, float raytmin, float raytmax, Vector3f invDir, const int dirIsNeg[3]) const {
+        const Bound3f& bounds = *this;
+        float tmin = (bounds[dirIsNeg[0]].x() - ray.getOrigin().x()) * invDir.x();
+        float tmax = (bounds[1 - dirIsNeg[0]].x() - ray.getOrigin().x()) * invDir.x();
+        float tymin = (bounds[dirIsNeg[1]].y() - ray.getOrigin().y()) * invDir.y();
+        float tymax = (bounds[1 - dirIsNeg[1]].y() - ray.getOrigin().y()) * invDir.y();
+
+        if ((tmin > tymax) || (tymin > tmax)) return false;
+        if (tymin > tmin) tmin = tymin;
+        if (tymax < tmax) tmax = tymax;
+
+        float tzmin = (bounds[dirIsNeg[2]].z() - ray.getOrigin().z()) * invDir.z();
+        float tzmax = (bounds[1 - dirIsNeg[2]].z() - ray.getOrigin().z()) * invDir.z();
+
+        if ((tmin > tzmax) || (tzmin > tmax)) return false;
+        if (tzmin > tmin) tmin = tzmin;
+        if (tzmax < tmax) tmax = tzmax;
+
+        return (tmin < raytmax) && (tmax > raytmin);
     }
 };
 

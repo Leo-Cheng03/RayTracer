@@ -40,13 +40,17 @@ int main(int argc, char *argv[]) {
     // Then loop over each pixel in the image, shooting a ray
 
     for (int y = 0; y < scene.getCamera()->getHeight(); y++) {
+    // for (int y = 0; y < 1; y++) {
         for (int x = 0; x < scene.getCamera()->getWidth(); x++) {
+        // for (int x = 0; x < 1; x++) {
             // through that pixel and finding its intersection with
             // the scene.  Write the color at the intersection to that
             // pixel in your output image.
             Vector3f color = Vector3f::ZERO;
             for (int s = 0; s < sampler.SamplesPerPixel(); s++) {
                 sampler.StartPixel(x, y, s);
+
+                // std::cout << "Pixel: (" << x << ", " << y << ") Sample: " << s << "\n";
 
                 Ray ray = scene.getCamera()->generateRay(Vector2f(x, y) + sampler.Get2D());
                 Group* baseGroup = scene.getGroup();
@@ -67,6 +71,8 @@ int main(int argc, char *argv[]) {
 
                 std::cout << std::fixed << std::setprecision(2);
                 std::cout << "\rProgess: " << (float)((sampler.SamplesPerPixel()) * (y * scene.getCamera()->getWidth() + x - 1) + s) * 100 / (float)((scene.getCamera()->getWidth() * scene.getCamera()->getHeight()) * sampler.SamplesPerPixel()) << "%" << std::flush;
+
+                // std::cout << std::endl;
             }
             color /= sampler.SamplesPerPixel();
             image.SetPixel(x, y, color);

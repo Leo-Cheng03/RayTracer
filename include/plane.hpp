@@ -20,7 +20,7 @@ public:
 
     ~Plane() override = default;
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override {
+    bool intersect(const Ray &r, Hit &h, float tmin) const override {
         float nd = Vector3f::dot(normal, r.getDirection());
         if (nd == 0) return false;
         float t = (d - Vector3f::dot(normal, r.getOrigin())) / nd;
@@ -29,11 +29,15 @@ public:
         return true;
     }
 
-    bool intersectP(const Ray &r, float tmin, float tmax) override {
+    bool intersectP(const Ray &r, float tmin, float tmax) const override {
         float nd = Vector3f::dot(normal, r.getDirection());
         if (nd == 0) return false;
         float t = (d - Vector3f::dot(normal, r.getOrigin())) / nd;
         return t >= tmin && t <= tmax;
+    }
+
+    Bound3f Bounds() const override {
+        return Bound3f(Vector3f(-INFINITY, -INFINITY, -INFINITY), Vector3f(INFINITY, INFINITY, INFINITY));
     }
 
 protected:

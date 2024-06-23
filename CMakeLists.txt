@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 PROJECT(COURSEWORK CXX)
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -12,7 +12,8 @@ SET(CW_SOURCES
         src/main.cpp
         src/integrator.cpp
         src/mesh.cpp
-        src/scene_parser.cpp)
+        src/scene_parser.cpp
+        src/bvh.cpp)
 
 SET(CW_INCLUDES
         include/camera.hpp
@@ -30,9 +31,10 @@ SET(CW_INCLUDES
         include/transform.hpp
         include/triangle.hpp
         include/integrator.hpp
+        include/bvh.hpp
         )
 
-SET(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${CW_SOURCES} ${CW_INCLUDES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} vecmath)

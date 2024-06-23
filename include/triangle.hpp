@@ -20,8 +20,8 @@ public:
 		vertices[2] = c;
 	}
 
-	bool intersect( const Ray& ray,  Hit& hit , float tmin) override {
-        Vector3f edge1, edge2;
+	bool intersect( const Ray& ray,  Hit& hit , float tmin) const override {
+		Vector3f edge1, edge2;
 		Vector3f pvec, tvec, qvec;
 		float det, inv_det, u, v, t;
 
@@ -51,8 +51,8 @@ public:
 		return true;
 	}
 
-	bool intersectP(const Ray& ray, float tmin, float tmax) override {
-		if (material->getBSDF()->IsTransparent()) return false;
+	bool intersectP(const Ray& ray, float tmin, float tmax) const override {
+		// if (material->getBSDF()->IsTransparent()) return false;
 		
 		Vector3f edge1, edge2;
 		Vector3f pvec, tvec, qvec;
@@ -79,6 +79,15 @@ public:
 
 		return true;
 	}
+
+	Bound3f Bounds() const override {
+		Bound3f bound = Bound3f(vertices[0]);
+		for (int i = 1; i < 3; i++) {
+			bound = Bound3f::Union(bound, vertices[i]);
+		}
+		return bound;
+	}
+
 	Vector3f normal;
 	Vector3f vertices[3];
 protected:

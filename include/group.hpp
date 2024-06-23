@@ -28,7 +28,7 @@ public:
         }
     }
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override {
+    bool intersect(const Ray &r, Hit &h, float tmin) const override {
         bool hit = false;
         for (auto obj : objects) {
             if (obj && obj->intersect(r, h, tmin)) {
@@ -38,7 +38,7 @@ public:
         return hit;
     }
 
-    bool intersectP(const Ray& ray, float tmin, float tmax) override {
+    bool intersectP(const Ray& ray, float tmin, float tmax) const override {
         for (auto obj : objects) {
             if (obj && obj->intersectP(ray, tmin, tmax)) {
                 return true;
@@ -53,6 +53,14 @@ public:
 
     int getGroupSize() {
         return objects.size();
+    }
+
+    Bound3f Bounds() const {
+        Bound3f bound;
+        for (auto obj : objects) {
+            bound = Bound3f::Union(bound, obj->Bounds());
+        }
+        return bound;
     }
 
 private:

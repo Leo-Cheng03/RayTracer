@@ -6,31 +6,23 @@
 #include <utility>
 #include <sstream>
 
-bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
+bool Mesh::intersect(const Ray &r, Hit &h, float tmin) const {
 
     // Optional: Change this brute force method into a faster one.
-    bool result = false;
-    for (int triId = 0; triId < (int) t.size(); ++triId) {
-        TriangleIndex& triIndex = t[triId];
-        Triangle triangle(v[triIndex[0]],
-                          v[triIndex[1]], v[triIndex[2]], material);
-        triangle.normal = n[triId];
-        result |= triangle.intersect(r, h, tmin);
-    }
+    bool result = bvh->Intersect(r, h, tmin);
     return result;
 }
 
-bool Mesh::intersectP(const Ray &r, float tmin, float tmax) {
-    for (int triId = 0; triId < (int) t.size(); ++triId) {
-        TriangleIndex& triIndex = t[triId];
-        Triangle triangle(v[triIndex[0]],
-                          v[triIndex[1]], v[triIndex[2]], material);
-        triangle.normal = n[triId];
-        if (triangle.intersectP(r, tmin, tmax)) {
-            return true;
-        }
+bool Mesh::intersectP(const Ray &r, float tmin, float tmax) const {
+    return bvh->IntersectP(r, tmin, tmax);
+}
+
+Bound3f Mesh::Bounds() const {
+    Bound3f bound;
+    for (const Vector3f& vec : v) {
+        bound = Bound3f::Union(bound, vec);
     }
-    return false;
+    return bound;
 }
 
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
@@ -94,6 +86,15 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     computeNormal();
 
     f.close();
+
+    std::vector<Object3D*> triangles;
+    for (int triId = 0; triId < (int) t.size(); ++triId) {
+        TriangleIndex& triIndex = t[triId];
+        Triangle* triangle = new Triangle(v[triIndex[0]], v[triIndex[1]], v[triIndex[2]], material);
+        triangle->normal = n[triId];
+        triangles.push_back(triangle);
+    }
+    bvh = new BVH(triangles);
 }
 
 void Mesh::computeNormal() {

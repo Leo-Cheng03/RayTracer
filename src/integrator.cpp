@@ -39,6 +39,12 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
 
     // Check if the ray intersects with any object in the scene
     if (primitives->intersect(ray, hit, 0.001f)) {
+        // std::cout << "Hit at depth " << depth << std::endl;
+
+        // std::cout << "Hit point: " << ray.getOrigin() + ray.getDirection() * hit.getT() << std::endl;
+        // std::cout << "Hit normal: " << hit.getNormal() << std::endl;
+        // std::cout << "Hit direction: " << -ray.getDirection() << std::endl;
+
         // If it does, get the surface normal and material properties
         Vector3f hitPoint = ray.pointAtParameter(hit.getT());
         Vector3f normal = hit.getNormal();
@@ -78,6 +84,7 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
         }
 
         if (ls.pdf != 0 && !primitives->intersectP(shadowRay, 0.001f, tmax)) {
+            // return {1, 1, 1};
             finalColor += ls.Li * std::abs(Vector3f::dot(ls.wi, normal)) / ls.pdf * material->f(localWo, localWi);
         }
 
