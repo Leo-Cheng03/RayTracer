@@ -24,7 +24,9 @@ public:
     };
 
     std::vector<Vector3f> v;
+    std::vector<Vector2f> vt;
     std::vector<TriangleIndex> t;
+    std::vector<TriangleIndex> tex;
     std::vector<Vector3f> n;
     bool intersect(const Ray &r, Hit &h, float tmin) const override;
     bool intersectP(const Ray &r, float tmin, float tmax) const override;

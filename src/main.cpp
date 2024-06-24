@@ -55,6 +55,7 @@ int main(int argc, char *argv[]) {
 
                 // std::cout << "Pixel: (" << x << ", " << y << ") Sample: " << s << "\n";
                 FilterSample fs = filter.Sample(sampler.Get2D());
+                fs.weight = 1.0;
                 weightSum += fs.weight;
                 Ray ray = scene.getCamera()->generateRay(Vector2f(x, y) + fs.p + Vector2f(0.5, 0.5)); // TODO: use the Gaussian distribution.
                 Group* baseGroup = scene.getGroup();

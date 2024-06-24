@@ -47,7 +47,9 @@ public:
 
 		if (t < tmin || t > hit.getT()) return false;
 
-		hit.set(t, material, normal);
+		Vector2f uv = texCoords[0] + u * (texCoords[1] - texCoords[0]) + v * (texCoords[2] - texCoords[0]);
+
+		hit.set(t, material, normal, uv);
 		return true;
 	}
 
@@ -88,8 +90,15 @@ public:
 		return bound;
 	}
 
+	void setTexCoord(const Vector2f& a, const Vector2f& b, const Vector2f& c) {
+		texCoords[0] = a;
+		texCoords[1] = b;
+		texCoords[2] = c;
+	}
+
 	Vector3f normal;
 	Vector3f vertices[3];
+	Vector2f texCoords[3];
 protected:
 
 };

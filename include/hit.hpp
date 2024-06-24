@@ -15,16 +15,18 @@ public:
         t = 1e38;
     }
 
-    Hit(float _t, Material *m, const Vector3f &n) {
+    Hit(float _t, Material *m, const Vector3f &n, const Vector2f& _uv = Vector2f(0, 0)) {
         t = _t;
         material = m;
         normal = n;
+        uv = _uv;
     }
 
     Hit(const Hit &h) {
         t = h.t;
         material = h.material;
         normal = h.normal;
+        uv = h.uv;
     }
 
     // destructor
@@ -42,17 +44,23 @@ public:
         return normal;
     }
 
-    void set(float _t, Material *m, const Vector3f &n) {
+    const Vector2f &getUV() const {
+        return uv;
+    }
+
+    void set(float _t, Material *m, const Vector3f &n, 
+            const Vector2f& _uv = Vector2f(0, 0)) {
         t = _t;
         material = m;
         normal = n;
+        uv = _uv;
     }
 
 private:
     float t;
     Material *material;
     Vector3f normal;
-
+    Vector2f uv;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Hit &h) {

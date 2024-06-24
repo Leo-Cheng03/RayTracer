@@ -2,6 +2,7 @@
 #define VECTOR_2F_H
 
 #include <cmath>
+#include <iostream>
 
 class Vector3f;
 
@@ -90,5 +91,10 @@ Vector2f operator / ( const Vector2f& v, float f );
 
 bool operator == ( const Vector2f& v0, const Vector2f& v1 );
 bool operator != ( const Vector2f& v0, const Vector2f& v1 );
+
+inline std::ostream &operator<<(std::ostream &os, const Vector2f &v) {
+    os << "(" << v.x() << ", " << v.y() << ")";
+    return os;
+}
 
 #endif // VECTOR_2F_H

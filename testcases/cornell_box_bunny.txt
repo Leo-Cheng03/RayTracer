@@ -47,7 +47,7 @@ Group {
         Translate -5 4 0
         Scale 1 4 4
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 1
@@ -55,7 +55,7 @@ Group {
         Translate 5 4 0
         Scale 1 4 4
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 2
@@ -63,7 +63,7 @@ Group {
         Translate 0 4 -5
         Scale 4 4 1
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 2
@@ -71,7 +71,7 @@ Group {
         Translate 0 9 0
         Scale 4 1 4
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 2
@@ -79,7 +79,7 @@ Group {
         Translate 0 -1 0
         Scale 4 1 4
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 3

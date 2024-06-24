@@ -63,12 +63,15 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
                 std::replace(line.begin(), line.end(), bslash, space);
                 std::stringstream facess(line);
                 TriangleIndex trig;
+                TriangleIndex texCoords;
                 facess >> tok;
                 for (int ii = 0; ii < 3; ii++) {
-                    facess >> trig[ii] >> texID;
+                    facess >> trig[ii] >> texCoords[ii];
                     trig[ii]--;
+                    texCoords[ii]--;
                 }
                 t.push_back(trig);
+                tex.push_back(texCoords);
             } else {
                 TriangleIndex trig;
                 for (int ii = 0; ii < 3; ii++) {
@@ -81,6 +84,7 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
             Vector2f texcoord;
             ss >> texcoord[0];
             ss >> texcoord[1];
+            vt.push_back(texcoord);
         }
     }
     computeNormal();
@@ -92,6 +96,13 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
         TriangleIndex& triIndex = t[triId];
         Triangle* triangle = new Triangle(v[triIndex[0]], v[triIndex[1]], v[triIndex[2]], material);
         triangle->normal = n[triId];
+        if (vt.size() > 0) {
+            triangle->setTexCoord(vt[tex[triId][0]], vt[tex[triId][1]], vt[tex[triId][2]]);
+        }
+        else {
+            triangle->setTexCoord(Vector2f(0, 0), Vector2f(0, 1), Vector2f(1, 1));
+        }
+
         triangles.push_back(triangle);
     }
     bvh = new BVH(triangles);
