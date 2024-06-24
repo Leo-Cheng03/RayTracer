@@ -39,6 +39,8 @@ public:
 	Vector2f xx() const;
 	Vector2f yy() const;
 
+	float length() const;
+
 	// returns ( -y, x )
     Vector2f normal() const;
 

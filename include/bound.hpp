@@ -7,6 +7,135 @@
 
 #include "ray.hpp"
 
+class Bound2f {
+public:
+    Vector2f pMin, pMax;
+
+public:
+    Bound2f() {
+        pMin = Vector2f(FLT_MAX, FLT_MAX);
+        pMax = Vector2f(-FLT_MAX, -FLT_MAX);
+    }
+
+    Bound2f(const Vector2f& p1, const Vector2f& p2) {
+        pMin = Vector2f(
+            std::min(p1.x(), p2.x()),
+            std::min(p1.y(), p2.y())
+        );
+        pMax = Vector2f(
+            std::max(p1.x(), p2.x()),
+            std::max(p1.y(), p2.y())
+        );
+    }
+
+    explicit Bound2f(const Vector2f& p) : pMin(p), pMax(p) {}
+
+    Vector2f operator[](int i) const {
+        return i == 0 ? pMin : pMax;
+    }
+
+    Vector2f& operator[](int i) {
+        return i == 0 ? pMin : pMax;
+    }
+
+    Vector2f Corner(int corner) const {
+        return Vector2f(
+            (*this)[(corner & 1)].x(),
+            (*this)[(corner & 2) ? 1 : 0].y()
+        );
+    }
+
+    Vector2f Diagonal() const {
+        return pMax - pMin;
+    }
+
+    float SurfaceArea() const {
+        Vector2f d = Diagonal();
+        return d.x() * d.y();
+    }
+
+    int MaxDimension() const {
+        Vector2f d = Diagonal();
+        return d.x() > d.y() ? 0 : 1;
+    }
+
+    Vector2f Lerp(float tx, float ty) const {
+        return Vector2f(
+            tx * pMin.x() + (1 - tx) * pMax.x(),
+            ty * pMin.y() + (1 - ty) * pMax.y()
+        );
+    }
+
+    Vector2f Offset(const Vector2f& p) const {
+        Vector2f o = p - pMin;
+        if (pMax.x() > pMin.x()) o.x() /= pMax.x() - pMin.x();
+        if (pMax.y() > pMin.y()) o.y() /= pMax.y() - pMin.y();
+        return o;
+    }
+
+    void BoundingSphere(Vector2f& center, float& radius) const {
+        center = (pMin + pMax) / 2;
+        radius = Inside(center, *this) ? (center - pMax).length() : 0;
+    }
+
+    bool IsEmpty() const {
+        return pMin.x() >= pMax.x() || pMin.y() >= pMax.y();
+    }
+
+    bool IsDegenerate() const {
+        return pMin.x() > pMax.x() || pMin.y() > pMax.y();
+    }
+
+    // Inline functions
+    static bool Inside(const Vector2f& p, const Bound2f& b) {
+        return p.x() >= b[0].x() && p.x() <= b[1].x() &&
+            p.y() >= b[0].y() && p.y() <= b[1].y();
+    }
+
+    static Bound2f Union(const Bound2f& b, const Vector2f& p) {
+        Bound2f ret;
+        ret.pMin = Vector2f(
+            std::min(b.pMin.x(), p.x()),
+            std::min(b.pMin.y(), p.y())
+        );
+        ret.pMax = Vector2f(
+            std::max(b.pMax.x(), p.x()),
+            std::max(b.pMax.y(), p.y())
+        );
+        return ret;
+    }
+
+    static Bound2f Union(const Bound2f& b1, const Bound2f& b2) {
+        Bound2f ret;
+        ret.pMin = Vector2f(
+            std::min(b1.pMin.x(), b2.pMin.x()),
+            std::min(b1.pMin.y(), b2.pMin.y())
+        );
+        ret.pMax = Vector2f(
+            std::max(b1.pMax.x(), b2.pMax.x()),
+            std::max(b1.pMax.y(), b2.pMax.y())
+        );
+        return ret;
+    }
+
+    static Bound2f Intersect(const Bound2f& b1, const Bound2f& b2) {
+        Bound2f ret;
+        ret.pMin = Vector2f(
+            std::max(b1.pMin.x(), b2.pMin.x()),
+            std::max(b1.pMin.y(), b2.pMin.y())
+        );
+        ret.pMax = Vector2f(
+            std::min(b1.pMax.x(), b2.pMax.x()),
+            std::min(b1.pMax.y(), b2.pMax.y())
+        );
+        return ret;
+    }
+
+    static Bound2f Expand(const Bound2f& b, float delta) {
+        return Bound2f(b.pMin - Vector2f(delta, delta), b.pMax + Vector2f(delta, delta));
+    }
+};
+
 class Bound3f {
 public:
     Vector3f pMin, pMax;

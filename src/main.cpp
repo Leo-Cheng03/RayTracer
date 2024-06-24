@@ -13,6 +13,7 @@
 #include "light.hpp"
 #include "integrator.hpp"
 #include "sampler.hpp"
+#include "filter.hpp"
 
 #include <string>
 
@@ -37,6 +38,7 @@ int main(int argc, char *argv[]) {
     Integrator integrator;
     StratifiedSampler sampler(2, 2, true);
     // RandomSampler sampler(4);
+    Filter filter(Vector2f(0.5, 0.5), 0.5, sampler);
     // Then loop over each pixel in the image, shooting a ray
 
     for (int y = 0; y < scene.getCamera()->getHeight(); y++) {
@@ -47,34 +49,41 @@ int main(int argc, char *argv[]) {
             // the scene.  Write the color at the intersection to that
             // pixel in your output image.
             Vector3f color = Vector3f::ZERO;
+            float weightSum = 0.0f;
             for (int s = 0; s < sampler.SamplesPerPixel(); s++) {
                 sampler.StartPixel(x, y, s);
 
                 // std::cout << "Pixel: (" << x << ", " << y << ") Sample: " << s << "\n";
-
-                Ray ray = scene.getCamera()->generateRay(Vector2f(x, y) + sampler.Get2D());
+                FilterSample fs = filter.Sample(sampler.Get2D());
+                weightSum += fs.weight;
+                Ray ray = scene.getCamera()->generateRay(Vector2f(x, y) + fs.p + Vector2f(0.5, 0.5)); // TODO: use the Gaussian distribution.
                 Group* baseGroup = scene.getGroup();
 
                 if (x == 107 && y == image.Height() - 198) {
                     std::cout << std::endl;
-                    color += integrator.SampleL(scene, ray, sampler, true);
-                    std::cout << "Final Color: " << color << std::endl << std::endl;
+                    Vector3f pixelColor = integrator.SampleL(scene, ray, sampler, true);
+                    std::cout << "Final Color: " << pixelColor << std::endl << std::endl;
+                    color +=  pixelColor * fs.weight;
 
                     if (s == sampler.SamplesPerPixel() - 1) {
-                        std::cout << "Final Final Color: " << color / sampler.SamplesPerPixel() << std::endl << std::endl;
+                        std::cout << "Final Final Color: " << color / weightSum << std::endl << std::endl;
                     }
-
                 }
                 else {
-                    color += integrator.SampleL(scene, ray, sampler, false);
+                    color += integrator.SampleL(scene, ray, sampler, false) * fs.weight;
                 }
 
                 std::cout << std::fixed << std::setprecision(2);
-                std::cout << "\rProgess: " << (float)((sampler.SamplesPerPixel()) * (y * scene.getCamera()->getWidth() + x - 1) + s) * 100 / (float)((scene.getCamera()->getWidth() * scene.getCamera()->getHeight()) * sampler.SamplesPerPixel()) << "%" << std::flush;
+                std::cout << "\rProgess: " << 
+                            (float)((sampler.SamplesPerPixel()) * 
+                            (y * scene.getCamera()->getWidth() + x - 1) + s) * 100 / 
+                            (float)((scene.getCamera()->getWidth() * 
+                                    scene.getCamera()->getHeight()) * 
+                                    sampler.SamplesPerPixel()) << "%" << std::flush;
 
                 // std::cout << std::endl;
             }
-            color /= sampler.SamplesPerPixel();
+            color /= weightSum;
             image.SetPixel(x, y, color);
         }
     }

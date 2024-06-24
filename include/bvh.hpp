@@ -82,7 +82,7 @@ public:
                     );
 
         std::cout << "BVH tree built." << std::endl;
-        PrintTree();
+        // PrintTree();
     }
 
     ~BVH() {
