@@ -38,7 +38,7 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
     }
 
     // Check if the ray intersects with any object in the scene
-    if (primitives->intersect(ray, hit, 0.001f)) {
+    if (primitives->intersect(ray, hit, 0.005f)) {
         // std::cout << "Hit at depth " << depth << std::endl;
 
         // std::cout << "Hit point: " << ray.getOrigin() + ray.getDirection() * hit.getT() << std::endl;
@@ -87,6 +87,23 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
         }
 
         if (ls.pdf != 0 && !primitives->intersectP(shadowRay, 0.001f, tmax)) {
+            if (log) {
+                std::cout << "tangent: " << context.tangent << std::endl;
+                std::cout << "bitangent: " << context.bitangent << std::endl;
+
+                std::cout << "Tangent to world: " << std::endl;
+                std::cout << tangentToWorld(0, 0) << " " << tangentToWorld(0, 1) << " " << tangentToWorld(0, 2) << std::endl;
+                std::cout << tangentToWorld(1, 0) << " " << tangentToWorld(1, 1) << " " << tangentToWorld(1, 2) << std::endl;
+                std::cout << tangentToWorld(2, 0) << " " << tangentToWorld(2, 1) << " " << tangentToWorld(2, 2) << std::endl;
+
+                material->PrintName();
+                material->debug = true;
+                std::cout << "localWo: " << localWo << std::endl;
+                std::cout << "localWi: " << localWi << std::endl;
+                std::cout << "f: " << material->f(localWo, localWi, context) << std::endl;
+                std::cout << "pdf: " << ls.pdf << std::endl;
+                material->debug = false;
+            }
             finalColor += ls.Li * std::abs(Vector3f::dot(ls.wi, normal)) / ls.pdf * material->f(localWo, localWi, context);
         }
 
@@ -96,6 +113,10 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
         
         // Indirect lighting
         BSDFSample bs = material->Sample_f(localWo, context, sampler);
+        if (bs.wi == Vector3f::ZERO) {
+            return finalColor;
+        }
+
         Vector3f sampleDir = (tangentToWorld * bs.wi).normalized();
         Ray sampleRay(hitPoint, sampleDir);
 

@@ -263,6 +263,8 @@ void SceneParser::parseMaterials() {
             materials[count] = parseSpecularReflectionMaterial();
         } else if (!strcmp(token, "SpecularTransmission")) {
             materials[count] = parseSpecularTransmissionMaterial();
+        } else if (!strcmp(token, "Metalic")) {
+            materials[count] = parseMetalicMaterial();
         } else if (!strcmp(token, "Mixed")) {
             materials[count] = parseMixedMaterial();
         } else {
@@ -356,6 +358,33 @@ Material *SceneParser::parseSpecularTransmissionMaterial()
     return answer;
 }
 
+Material *SceneParser::parseMetalicMaterial()
+{
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    Vector3fSampler* albedo = nullptr;
+    float roughness = 1.0f;
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    while (true) {
+        getToken(token);
+        if (strcmp(token, "albedo") == 0) {
+            albedo = new Vector3fConstant(readVector3f());
+        } else if (strcmp(token, "albedoTexture") == 0) {
+            getToken(filename);
+            albedo = new Vector3fTexture(filename);
+        } else if (strcmp(token, "roughness") == 0) {
+            roughness = readFloat();
+        } else {
+            assert (!strcmp(token, "}"));
+            break;
+        }
+    }
+    auto *answer = new MetalicMaterial(albedo, roughness);
+    return answer;
+}
+
 Material *SceneParser::parseMixedMaterial()
 {
     char token[MAX_PARSER_TOKEN_LENGTH];
@@ -378,6 +407,9 @@ Material *SceneParser::parseMixedMaterial()
             count++;
         } else if (!strcmp(token, "SpecularTransmission")) {
             materials[count] = parseSpecularTransmissionMaterial();
+            count++;
+        } else if (!strcmp(token, "Metalic")) {
+            materials[count] = parseMetalicMaterial();
             count++;
         } else if (!strcmp(token, "Mixed")) {
             materials[count] = parseMixedMaterial();

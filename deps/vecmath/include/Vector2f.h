@@ -41,6 +41,7 @@ public:
 	Vector2f yy() const;
 
 	float length() const;
+	float lengthSquared() const;
 
 	// returns ( -y, x )
     Vector2f normal() const;

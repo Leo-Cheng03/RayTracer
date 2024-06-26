@@ -102,6 +102,11 @@ float Vector2f::length() const
     return sqrt( m_elements[0] * m_elements[0] + m_elements[1] * m_elements[1] );
 }
 
+float Vector2f::lengthSquared() const
+{
+    return m_elements[0] * m_elements[0] + m_elements[1] * m_elements[1];
+}
+
 Vector2f Vector2f::normal() const
 {
     return Vector2f( -m_elements[1], m_elements[0] );

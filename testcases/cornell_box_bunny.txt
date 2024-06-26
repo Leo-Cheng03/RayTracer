@@ -38,8 +38,9 @@ Materials {
         albedo 0.73 0.73 0.73 
         normalMap textures/brick_wall_nor_1k.bmp
     }
-    Diffuse {
+    RoughReflection {
         albedo 0.3 0.3 0.7
+        roughness 0.1
     }
     SpecularReflection {
         albedo 1.0 1.0 1.0

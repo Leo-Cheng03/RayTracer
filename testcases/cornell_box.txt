@@ -25,27 +25,44 @@ Background {
 }
 
 Materials {
-    numMaterials 5
-    Diffuse { albedo 0.65 0.05 0.05 }
-    Diffuse { albedo 0.12 0.45 0.15 }
-    Diffuse { albedo 0.73 0.73 0.73 }
-    SpecularTransmission {
+    numMaterials 7
+    Diffuse { 
+        albedo 0.65 0.05 0.05 
+        normalMap textures/brick_wall_nor_1k.bmp
+    }
+    Diffuse { 
+        albedo 0.12 0.45 0.15 
+        normalMap textures/brick_wall_nor_1k.bmp
+    }
+    Diffuse { 
+        albedo 0.73 0.73 0.73 
+        normalMap textures/brick_wall_nor_1k.bmp
+    }
+    Metalic {
         albedo 1.0 1.0 1.0
-        eta 1.52
+        roughness 0.3
+    }
+    Metalic {
+        albedo 1.0 1.0 1.0
+        roughness 0.7
     }
     SpecularReflection {
         albedo 1.0 1.0 1.0
     }
+    Diffuse {
+        albedoTexture textures/brick_wall_diff_1k.bmp
+        normalMap textures/brick_wall_nor_1k.bmp
+    }
 }
 
 Group {
-    numObjects 7
+    numObjects 8
     MaterialIndex 0
     Transform {
         Translate -5 4 0
         Scale 1 4 4
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 1
@@ -53,15 +70,15 @@ Group {
         Translate 5 4 0
         Scale 1 4 4
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
-    MaterialIndex 2
+    MaterialIndex 6
     Transform {
         Translate 0 4 -5
         Scale 4 4 1
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 2
@@ -69,7 +86,7 @@ Group {
         Translate 0 9 0
         Scale 4 1 4
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 2
@@ -77,17 +94,22 @@ Group {
         Translate 0 -1 0
         Scale 4 1 4
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/cube_with_uv.obj
         }
     }
     MaterialIndex 3
     Sphere {
-        center 2 1.25 1
+        center -2 1.25 1
         radius 1.25
     }
     MaterialIndex 4
     Sphere {
-        center -1 1.25 -1
+        center 0 1.25 -1
+        radius 1.25
+    }
+    MaterialIndex 5
+    Sphere {
+        center 2 1.25 1
         radius 1.25
     }
 }

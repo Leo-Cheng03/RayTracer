@@ -27,6 +27,12 @@ inline Vector2f GetUniform2D() {
     return { GetUniform1D(), GetUniform1D() };
 }
 
+inline Vector2f SampleUniformDiskPolar(const Vector2f& u) {
+    float r = std::sqrt(u[0]);
+    float theta = 2 * M_PI * u[1];
+    return { r * std::cos(theta), r * std::sin(theta) };
+}
+
 inline Vector3f SampleCosineHemisphere(Vector2f u) {
     float sin_theta = sqrt(u.x());
     float phi = 2 * M_PI * u.y();

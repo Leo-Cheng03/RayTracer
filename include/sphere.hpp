@@ -37,7 +37,10 @@ public:
         if (t1 > tmin) {
             Vector3f normal = r.pointAtParameter(t1) - center;
             normal.normalize();
-            h.set(t1, material, normal);
+            Vector3f tangent = (normal.y() < 0.999f) ? Vector3f::cross(Vector3f::UP, normal) :
+                                                       Vector3f::cross(Vector3f::RIGHT, normal);
+            Vector3f bitangent = Vector3f::cross(normal, tangent);
+            h.set(t1, material, normal, Vector2f(0, 0), tangent, bitangent);
             return true;
         }
 

@@ -42,9 +42,9 @@ int main(int argc, char *argv[]) {
     // Then loop over each pixel in the image, shooting a ray
 
     for (int y = 0; y < scene.getCamera()->getHeight(); y++) {
-    // for (int y = 0; y < 1; y++) {
+    // for (int y = 118; y < 119; y++) {
         for (int x = 0; x < scene.getCamera()->getWidth(); x++) {
-        // for (int x = 0; x < 1; x++) {
+        // for (int x = 122; x < 123; x++) {
             // through that pixel and finding its intersection with
             // the scene.  Write the color at the intersection to that
             // pixel in your output image.
@@ -59,19 +59,36 @@ int main(int argc, char *argv[]) {
                 weightSum += fs.weight;
                 Ray ray = scene.getCamera()->generateRay(Vector2f(x, y) + fs.p + Vector2f(0.5, 0.5)); // TODO: use the Gaussian distribution.
                 Group* baseGroup = scene.getGroup();
+                Vector3f sampleColor = Vector3f::ZERO;
 
-                if (x == 107 && y == image.Height() - 198) {
+                if (x == 131 && y == image.Height() - 180 -1) {
                     std::cout << std::endl;
-                    Vector3f pixelColor = integrator.SampleL(scene, ray, sampler, true);
-                    std::cout << "Final Color: " << pixelColor << std::endl << std::endl;
-                    color +=  pixelColor * fs.weight;
+                    sampleColor = integrator.SampleL(scene, ray, sampler, true);
+                    if (std::isnan(sampleColor.x() || std::isnan(sampleColor.y()) || std::isnan(sampleColor.z()))) {
+                        weightSum -= fs.weight;
+                        continue;
+                    }
+                    std::cout << "Final Color: " << sampleColor << std::endl << std::endl;
+                    sampleColor *= fs.weight;
+                    sampleColor.x() = std::clamp(sampleColor.x(), 0.0f, 1.0f);
+                    sampleColor.y() = std::clamp(sampleColor.y(), 0.0f, 1.0f);
+                    sampleColor.z() = std::clamp(sampleColor.z(), 0.0f, 1.0f);
+                    color +=  sampleColor;
 
                     if (s == sampler.SamplesPerPixel() - 1) {
                         std::cout << "Final Final Color: " << color / weightSum << std::endl << std::endl;
                     }
                 }
                 else {
-                    color += integrator.SampleL(scene, ray, sampler, false) * fs.weight;
+                    sampleColor = integrator.SampleL(scene, ray, sampler, false) * fs.weight;
+                    if (std::isnan(sampleColor.x() || std::isnan(sampleColor.y()) || std::isnan(sampleColor.z()))) {
+                        weightSum -= fs.weight;
+                        continue;
+                    }
+                    sampleColor.x() = std::clamp(sampleColor.x(), 0.0f, 1.0f);
+                    sampleColor.y() = std::clamp(sampleColor.y(), 0.0f, 1.0f);
+                    sampleColor.z() = std::clamp(sampleColor.z(), 0.0f, 1.0f);
+                    color +=  sampleColor;
                 }
 
                 std::cout << std::fixed << std::setprecision(2);
@@ -85,6 +102,9 @@ int main(int argc, char *argv[]) {
                 // std::cout << std::endl;
             }
             color /= weightSum;
+            if (x == 131 && y == image.Height() - 180 - 1) {
+                std::cout << "Final Color: " << color << std::endl;
+            }
             image.SetPixel(x, y, color);
         }
     }
