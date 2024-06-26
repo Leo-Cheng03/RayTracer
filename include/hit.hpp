@@ -15,11 +15,14 @@ public:
         t = 1e38;
     }
 
-    Hit(float _t, Material *m, const Vector3f &n, const Vector2f& _uv = Vector2f(0, 0)) {
+    Hit(float _t, Material *m, const Vector3f &n, const Vector2f& _uv = Vector2f(0, 0), 
+            const Vector3f& _tangent = Vector3f::ZERO, const Vector3f& _bitangent = Vector3f::ZERO) {
         t = _t;
         material = m;
         normal = n;
         uv = _uv;
+        tangent = _tangent;
+        bitangent = _bitangent;
     }
 
     Hit(const Hit &h) {
@@ -27,6 +30,8 @@ public:
         material = h.material;
         normal = h.normal;
         uv = h.uv;
+        tangent = h.tangent;
+        bitangent = h.bitangent;
     }
 
     // destructor
@@ -48,18 +53,32 @@ public:
         return uv;
     }
 
+    const Vector3f &getTangent() const {
+        return tangent;
+    }
+
+    const Vector3f &getBitangent() const {
+        return bitangent;
+    }
+
     void set(float _t, Material *m, const Vector3f &n, 
-            const Vector2f& _uv = Vector2f(0, 0)) {
+            const Vector2f& _uv = Vector2f(0, 0), 
+            const Vector3f& _tangent = Vector3f::ZERO, 
+            const Vector3f& _bitangent = Vector3f::ZERO) {
         t = _t;
         material = m;
         normal = n;
         uv = _uv;
+        tangent = _tangent;
+        bitangent = _bitangent;
     }
 
 private:
     float t;
     Material *material;
     Vector3f normal;
+    Vector3f tangent;
+    Vector3f bitangent;
     Vector2f uv;
 };
 

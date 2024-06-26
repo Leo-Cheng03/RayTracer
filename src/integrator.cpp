@@ -46,22 +46,25 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
         // std::cout << "Hit direction: " << -ray.getDirection() << std::endl;
 
         // If it does, get the surface normal and material properties
+
+        // return hit.getBitangent() / 2 + Vector3f(0.5, 0.5, 0.5);
+
         Vector3f hitPoint = ray.pointAtParameter(hit.getT());
         Vector3f normal = hit.getNormal();
         Vector3f wo = -ray.getDirection();
         Vector3f wi;
+        MaterialSampleContext context(hit);
         
-        Vector3f wn = Vector3f::cross(wo, normal).normalized();
-        Matrix3f normalToWorld = Matrix3f(
-            Vector3f::cross(wn, normal).normalized(),
-            normal,
-            wn
-        );
-        Matrix3f worldToNormal = normalToWorld.inverse();
-
-        Vector3f localWo = (worldToNormal * wo).normalized();
-
         Material* material = hit.getMaterial();
+
+        Vector3f wn = Vector3f::cross(wo, normal).normalized();
+        Matrix3f tangentToWorld = material->GetTangentToWorld(context);
+
+        // return tangentToWorld * Vector3f::UP;
+
+        Matrix3f worldToTangent = tangentToWorld.inverse();
+
+        Vector3f localWo = (worldToTangent * wo).normalized();
 
         // Direct lighting
         // Sample a light based on power heuristic
@@ -73,7 +76,7 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
         // Create a new ray from the intersection point to the light source
         Ray shadowRay(hitPoint, ls.wi);
         // Check if the new ray intersects with any object in the scene
-        Vector3f localWi = (worldToNormal * ls.wi).normalized();
+        Vector3f localWi = (worldToTangent * ls.wi).normalized();
         float tmax = ls.distance;
 
         if (log) {
@@ -84,8 +87,7 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
         }
 
         if (ls.pdf != 0 && !primitives->intersectP(shadowRay, 0.001f, tmax)) {
-            // return {1, 1, 1};
-            finalColor += ls.Li * std::abs(Vector3f::dot(ls.wi, normal)) / ls.pdf * material->f(localWo, localWi);
+            finalColor += ls.Li * std::abs(Vector3f::dot(ls.wi, normal)) / ls.pdf * material->f(localWo, localWi, context);
         }
 
         if (log) {
@@ -93,8 +95,8 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
         }
         
         // Indirect lighting
-        BSDFSample bs = material->Sample_f(localWo, sampler);
-        Vector3f sampleDir = (normalToWorld * bs.wi).normalized();
+        BSDFSample bs = material->Sample_f(localWo, context, sampler);
+        Vector3f sampleDir = (tangentToWorld * bs.wi).normalized();
         Ray sampleRay(hitPoint, sampleDir);
 
         if (log) {

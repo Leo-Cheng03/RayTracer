@@ -14,6 +14,7 @@
 #include "plane.hpp"
 #include "triangle.hpp"
 #include "transform.hpp"
+#include "texturesampler.hpp"
 
 #define DegreesToRadians(x) ((M_PI * x) / 180.0f)
 
@@ -256,9 +257,14 @@ void SceneParser::parseMaterials() {
     int count = 0;
     while (num_materials > count) {
         getToken(token);
-        if (!strcmp(token, "Material") ||
-            !strcmp(token, "PhongMaterial")) {
-            materials[count] = parseMaterial();
+        if (!strcmp(token, "Diffuse")) {
+            materials[count] = parseDiffuseMaterial();
+        } else if (!strcmp(token, "SpecularReflection")) {
+            materials[count] = parseSpecularReflectionMaterial();
+        } else if (!strcmp(token, "SpecularTransmission")) {
+            materials[count] = parseSpecularTransmissionMaterial();
+        } else if (!strcmp(token, "Mixed")) {
+            materials[count] = parseMixedMaterial();
         } else {
             printf("Unknown token in parseMaterial: '%s'\n", token);
             exit(0);
@@ -269,33 +275,76 @@ void SceneParser::parseMaterials() {
     assert (!strcmp(token, "}"));
 }
 
-Material *SceneParser::parseMaterial() {
+Material *SceneParser::parseDiffuseMaterial() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
-    Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0);
-    float shininess = 0;
-    float eta = 1;
-    BSDFType type = DIFFUSE;
+    Vector3fSampler *albedo = nullptr;
+    Vector3fSampler *normalMap = nullptr;
     getToken(token);
     assert (!strcmp(token, "{"));
     while (true) {
         getToken(token);
-        if (strcmp(token, "diffuseColor") == 0) {
-            diffuseColor = readVector3f();
-        } else if (strcmp(token, "specularColor") == 0) {
-            specularColor = readVector3f();
-        } else if (strcmp(token, "shininess") == 0) {
-            shininess = readFloat();
-        } else if (strcmp(token, "texture") == 0) {
-            // Optional: read in texture and draw it.
+        if (strcmp(token, "albedo") == 0) {
+            albedo = new Vector3fConstant(readVector3f());
+        } else if (strcmp(token, "albedoTexture") == 0) {
             getToken(filename);
-        } else if (strcmp(token, "diffuse") == 0) {
-            type = DIFFUSE;
-        } else if (strcmp(token, "specular") == 0) {
-            type = SPECULAR_DIELETRIC;
-        } else if (strcmp(token, "specularReflectance") == 0) {
-            type = SPECULAR_REFLECTANCE;
+            albedo = new Vector3fTexture(filename);
+        } else if (strcmp(token, "normalMap") == 0) {
+            getToken(filename);
+            normalMap = new Vector3fTexture(filename);
+        } else {
+            assert (!strcmp(token, "}"));
+            break;
+        }
+    }
+    if (normalMap == nullptr) {
+        normalMap = new Vector3fConstant(Vector3f(0.5, 0.5, 1));
+    }
+    auto *answer = new DiffuseMaterial(albedo, normalMap);
+    return answer;
+}
+
+Material *SceneParser::parseSpecularReflectionMaterial()
+{
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    Vector3fSampler* albedo = nullptr;
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    while (true) {
+        getToken(token);
+        if (strcmp(token, "albedo") == 0) {
+            albedo = new Vector3fConstant(readVector3f());
+        } else if (strcmp(token, "albedoTexture") == 0) {
+            getToken(filename);
+            albedo = new Vector3fTexture(filename);
+        } else {
+            assert (!strcmp(token, "}"));
+            break;
+        }
+    }
+    auto *answer = new SpecularReflectionMaterial(albedo);
+    return answer;
+}
+
+Material *SceneParser::parseSpecularTransmissionMaterial()
+{
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    Vector3fSampler* albedo = nullptr;
+    float eta = 1.0f;
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    while (true) {
+        getToken(token);
+        if (strcmp(token, "albedo") == 0) {
+            albedo = new Vector3fConstant(readVector3f());
+        } else if (strcmp(token, "albedoTexture") == 0) {
+            getToken(filename);
+            albedo = new Vector3fTexture(filename);
         } else if (strcmp(token, "eta") == 0) {
             eta = readFloat();
         } else {
@@ -303,16 +352,48 @@ Material *SceneParser::parseMaterial() {
             break;
         }
     }
-    auto *answer = new Material(diffuseColor, specularColor, shininess);
-    BSDF *bsdf;
-    if (type == DIFFUSE) {
-        bsdf = new DiffuseBRDF(diffuseColor);
-    } else if (type == SPECULAR_REFLECTANCE) {
-        bsdf = new SpecularReflectanceBSDF(specularColor);
-    } else {
-        bsdf = new SpecularBSDF(specularColor, eta);
+    auto *answer = new SpecularTransmissionMaterial(albedo, eta);
+    return answer;
+}
+
+Material *SceneParser::parseMixedMaterial()
+{
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    
+    materials = new Material *[3];
+    FloatSampler* ratio = nullptr;
+
+    // read in the objects
+    int count = 0;
+    while (count <= 2) {
+        getToken(token);
+        if (!strcmp(token, "Diffuse")) {
+            materials[count] = parseDiffuseMaterial();
+            count++;
+        } else if (!strcmp(token, "SpecularReflection")) {
+            materials[count] = parseSpecularReflectionMaterial();
+            count++;
+        } else if (!strcmp(token, "SpecularTransmission")) {
+            materials[count] = parseSpecularTransmissionMaterial();
+            count++;
+        } else if (!strcmp(token, "Mixed")) {
+            materials[count] = parseMixedMaterial();
+            count++;
+        } else if (!strcmp(token, "ratio")) {
+            ratio = new FloatConstant(readFloat());
+        } else if (!strcmp(token, "ratioTexture")) {
+            getToken(filename);
+            ratio = new FloatTexture(filename, 0);
+        } else {
+            assert (!strcmp(token, "}"));
+            break;
+        }
     }
-    answer->setBSDF(bsdf);
+
+    auto* answer = new MixedMaterial(materials[0], materials[1], ratio);
     return answer;
 }
 

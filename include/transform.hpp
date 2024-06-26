@@ -31,7 +31,18 @@ public:
         Ray tr(trSource, trDirection);
         bool inter = o->intersect(tr, h, tmin);
         if (inter) {
-            h.set(h.getT(), h.getMaterial(), transformDirection(transform.transposed(), h.getNormal()).normalized(), h.getUV());
+            Vector3f tangent = h.getTangent() == Vector3f::ZERO ? 
+                Vector3f::ZERO : 
+                transformDirection(transform, h.getTangent()).normalized();
+
+            Vector3f bitangent = h.getBitangent() == Vector3f::ZERO ?
+                Vector3f::ZERO :
+                transformDirection(transform, h.getBitangent()).normalized();
+
+            h.set(h.getT(), h.getMaterial(), 
+                  transformDirection(transform.transposed(), h.getNormal()).normalized(), 
+                  h.getUV(), tangent, bitangent
+            );
         }
         return inter;
     }

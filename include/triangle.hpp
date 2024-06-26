@@ -47,9 +47,11 @@ public:
 
 		if (t < tmin || t > hit.getT()) return false;
 
-		Vector2f uv = texCoords[0] + u * (texCoords[1] - texCoords[0]) + v * (texCoords[2] - texCoords[0]);
+		Vector2f uv = texCoords[0] + 
+						u * (texCoords[1] - texCoords[0]) + 
+						v * (texCoords[2] - texCoords[0]);
 
-		hit.set(t, material, normal, uv);
+		hit.set(t, material, normal, uv, tangent, bitangent);
 		return true;
 	}
 
@@ -94,9 +96,22 @@ public:
 		texCoords[0] = a;
 		texCoords[1] = b;
 		texCoords[2] = c;
+
+		Vector3f edge1 = vertices[1] - vertices[0];
+		Vector3f edge2 = vertices[2] - vertices[0];
+
+		Vector2f deltaUV1 = texCoords[1] - texCoords[0];
+		Vector2f deltaUV2 = texCoords[2] - texCoords[0];
+
+		float f = 1.0f / (deltaUV1.x() * deltaUV2.y() - deltaUV2.x() * deltaUV1.y());
+
+		tangent = (f * (deltaUV2.y() * edge1 - deltaUV1.y() * edge2)).normalized();
+		bitangent = (f * (-deltaUV2.x() * edge1 + deltaUV1.x() * edge2)).normalized();
 	}
 
 	Vector3f normal;
+	Vector3f tangent;
+	Vector3f bitangent;
 	Vector3f vertices[3];
 	Vector2f texCoords[3];
 protected:

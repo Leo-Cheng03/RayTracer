@@ -196,6 +196,7 @@ Image* Image::LoadPPM(const char *filename) {
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****************************************************************************/
+#pragma pack(push, 1)
 struct BMPHeader
 {
     char bfType[3];       /* "BM" */
@@ -216,6 +217,8 @@ struct BMPHeader
     int biClrImportant;   /* Number of important colors.  If 0, all colors 
                              are important */
 };
+#pragma pack(pop)
+
 int 
 Image::SaveBMP(const char *filename)
 {
@@ -288,6 +291,68 @@ Image::SaveBMP(const char *filename)
     fclose(file);
 
     return(1);
+}
+
+Image* Image::LoadBMP(const char *filename)
+{
+    FILE *file;
+    BMPHeader bmph;
+    unsigned char *line;
+    int bytesPerLine;
+
+
+    file = fopen(filename, "rb");
+    if (file == NULL) return nullptr;
+
+    fread(&bmph.bfType, 2, 1, file);
+    fread(&bmph.bfSize, 4, 1, file);
+    fread(&bmph.bfReserved, 4, 1, file);
+    fread(&bmph.bfOffBits, 4, 1, file);
+    fread(&bmph.biSize, 4, 1, file);
+    fread(&bmph.biWidth, 4, 1, file);
+    fread(&bmph.biHeight, 4, 1, file);
+    fread(&bmph.biPlanes, 2, 1, file);
+    fread(&bmph.biBitCount, 2, 1, file);
+    fread(&bmph.biCompression, 4, 1, file);
+    fread(&bmph.biSizeImage, 4, 1, file);
+    fread(&bmph.biXPelsPerMeter, 4, 1, file);
+    fread(&bmph.biYPelsPerMeter, 4, 1, file);
+    fread(&bmph.biClrUsed, 4, 1, file);
+    fread(&bmph.biClrImportant, 4, 1, file);
+
+    if (bmph.biBitCount != 24) {
+        fprintf(stderr, "Not a 24-bit BMP file.\n");
+        return nullptr;
+    }
+
+    int width = bmph.biWidth;
+    int height = bmph.biHeight;
+
+    bytesPerLine = ((3 * (width + 1) / 4) * 4);
+    line = (unsigned char *)malloc(bytesPerLine);
+    if (line == NULL) {
+        fprintf(stderr, "Can't allocate memory for BMP file.\n");
+        return nullptr;
+    }
+
+    Image *answer = new Image(width,height);
+
+    Vector3f rgb;
+    for (int i = 0; i < height; i++) {
+        fread(line, bytesPerLine, 1, file);
+        for (int j = 0; j < width; j++) {
+            int ipos = (width * i + j);
+            rgb[2] = line[3*j] / 225.0f;
+            rgb[1] = line[3*j+1] / 225.0f;
+            rgb[0] = line[3*j+2] / 225.0f;
+            answer->SetPixel(j, i, rgb);
+        }
+    }
+
+    free(line);
+    fclose(file);
+
+    return answer;
 }
 
 void Image::SaveImage(const char * filename)
