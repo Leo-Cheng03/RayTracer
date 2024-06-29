@@ -19,7 +19,7 @@ public:
 
     // Intersect Ray with this object. If hit, store information in hit structure.
     virtual bool intersect(const Ray &r, Hit &h, float tmin) const = 0;
-    virtual bool intersectP(const Ray &r, float tmin, float tmax) const = 0;
+    virtual bool intersectP(const Ray &r, float tmin, float tmax, const Object3D* ignore) const = 0;
     
     virtual Bound3f Bounds() const = 0;
 

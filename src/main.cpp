@@ -41,10 +41,12 @@ int main(int argc, char *argv[]) {
     Filter filter(Vector2f(0.5, 0.5), 0.5, sampler);
     // Then loop over each pixel in the image, shooting a ray
 
+    std::cout << "start rendering...\n";
+
     for (int y = 0; y < scene.getCamera()->getHeight(); y++) {
-    // for (int y = 118; y < 119; y++) {
+    // for (int y = (image.Height() - 100 - 1); y < (image.Height() - 100); y++) {
         for (int x = 0; x < scene.getCamera()->getWidth(); x++) {
-        // for (int x = 122; x < 123; x++) {
+        // for (int x = 63; x < 64; x++) {
             // through that pixel and finding its intersection with
             // the scene.  Write the color at the intersection to that
             // pixel in your output image.
@@ -55,16 +57,18 @@ int main(int argc, char *argv[]) {
 
                 // std::cout << "Pixel: (" << x << ", " << y << ") Sample: " << s << "\n";
                 FilterSample fs = filter.Sample(sampler.Get2D());
-                fs.weight = 1.0;
+                // fs.weight = 1.0;
                 weightSum += fs.weight;
                 Ray ray = scene.getCamera()->generateRay(Vector2f(x, y) + fs.p + Vector2f(0.5, 0.5)); // TODO: use the Gaussian distribution.
                 Group* baseGroup = scene.getGroup();
                 Vector3f sampleColor = Vector3f::ZERO;
 
-                if (x == 131 && y == image.Height() - 180 -1) {
+                // if (true) {
+                if (x == 63 && y == image.Height() - 100 -1) {
+                // if (x == 0 && y == 0) {
                     std::cout << std::endl;
-                    sampleColor = integrator.SampleL(scene, ray, sampler, true);
-                    if (std::isnan(sampleColor.x() || std::isnan(sampleColor.y()) || std::isnan(sampleColor.z()))) {
+                    sampleColor = integrator.SampleL(scene, ray, sampler, nullptr, true);
+                    if (std::isnan(sampleColor.x()) || std::isnan(sampleColor.y()) || std::isnan(sampleColor.z())) {
                         weightSum -= fs.weight;
                         continue;
                     }
@@ -80,11 +84,12 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 else {
-                    sampleColor = integrator.SampleL(scene, ray, sampler, false) * fs.weight;
-                    if (std::isnan(sampleColor.x() || std::isnan(sampleColor.y()) || std::isnan(sampleColor.z()))) {
+                    sampleColor = integrator.SampleL(scene, ray, sampler, nullptr, false) * fs.weight;
+                    if (std::isnan(sampleColor.x()) || std::isnan(sampleColor.y()) || std::isnan(sampleColor.z())) {
                         weightSum -= fs.weight;
                         continue;
                     }
+                    sampleColor *= fs.weight;
                     sampleColor.x() = std::clamp(sampleColor.x(), 0.0f, 1.0f);
                     sampleColor.y() = std::clamp(sampleColor.y(), 0.0f, 1.0f);
                     sampleColor.z() = std::clamp(sampleColor.z(), 0.0f, 1.0f);
@@ -92,19 +97,16 @@ int main(int argc, char *argv[]) {
                 }
 
                 std::cout << std::fixed << std::setprecision(2);
-                std::cout << "\rProgess: " << 
+                std::cout << "\rProgress: " << 
                             (float)((sampler.SamplesPerPixel()) * 
                             (y * scene.getCamera()->getWidth() + x - 1) + s) * 100 / 
                             (float)((scene.getCamera()->getWidth() * 
                                     scene.getCamera()->getHeight()) * 
-                                    sampler.SamplesPerPixel()) << "%" << std::flush;
+                                    sampler.SamplesPerPixel()) << "% (" << x << ", " << y << ")" << std::flush;
 
                 // std::cout << std::endl;
             }
             color /= weightSum;
-            if (x == 131 && y == image.Height() - 180 - 1) {
-                std::cout << "Final Color: " << color << std::endl;
-            }
             image.SetPixel(x, y, color);
         }
     }

@@ -1,0 +1,126 @@
+PerspectiveCamera {
+    center 0.098923 3.308 8.89607
+    direction 0 0 -1
+    up 0 1 0
+    angle 48.4555
+    width 960
+    height 540
+}
+
+Lights {
+    numLights 5
+    AreaLight {
+        mesh mesh/plane.obj
+        position 0 7.899 -3.817
+        right 1 0 0
+        up 0 -1 0
+        size 3.345 3.345
+        color 1 1 1
+        scale 250
+    }
+    AreaLight {
+        mesh mesh/plane.obj
+        position 0 7.899 -14.362
+        right 1 0 0
+        up 0 -1 0
+        size 3.345 3.345
+        color 1 1 1
+        scale 250
+    }
+    AreaLight {
+        mesh mesh/plane.obj
+        position 0 7.899 -24.4401
+        right 1 0 0
+        up 0 -1 0
+        size 3.345 3.345
+        color 1 1 1
+        scale 250
+    }
+    AreaLight {
+        mesh mesh/plane.obj
+        position 0 7.899 -34.0056
+        right 1 0 0
+        up 0 -1 0
+        size 3.345 3.345
+        color 1 1 1
+        scale 250
+    }
+    AreaLight {
+        mesh mesh/plane.obj
+        position 0 7.899 -53.1563
+        right 1 0 0
+        up 0 -1 0
+        size 3.345 3.345
+        color 1 1 1
+        scale 250
+    }
+}
+
+Background {
+    color 0.0 0.0 0.0 
+}
+
+Materials {
+    numMaterials 7
+    Diffuse { 
+        albedoTexture textures/marble_01_diff_1k.bmp
+        normalMap textures/marble_01_nor_gl_1k.bmp
+    }
+    Diffuse { 
+        albedoTexture textures/long_white_tiles_diff_1k.bmp
+        normalMap textures/long_white_tiles_nor_gl_1k.bmp
+    }
+    Diffuse { 
+        albedoTexture textures/long_blue_tiles_diff_1k.bmp
+        normalMap textures/long_white_tiles_nor_gl_1k.bmp
+    }
+    Diffuse {
+        albedoTexture textures/painted_plaster_wall_diff_1k.bmp
+        normalMap textures/painted_plaster_wall_nor_gl_1k.bmp
+    }
+    Diffuse {
+        albedo 0.33717 0.296145 0.234548
+    }
+    Metalic {
+        albedo 1.0 1.0 1.0
+        roughness 0.3
+    }
+    SpecularTransmission {
+        albedo 1.0 1.0 1.0
+        normalMap textures/water_nor.bmp
+        eta 1.33
+    }
+}
+
+Group {
+    numObjects 7
+    MaterialIndex 0
+    TriangleMesh {
+        obj_file mesh/swimming-pool-floor.obj
+    }
+    MaterialIndex 1
+    TriangleMesh {
+        obj_file mesh/swimming-pool-pillar.obj
+    }
+    MaterialIndex 2
+    TriangleMesh {
+        obj_file mesh/swimming-pool.obj
+    }
+    MaterialIndex 3
+    TriangleMesh {
+        obj_file mesh/swimming-pool-wall.obj
+    }
+    MaterialIndex 4
+    TriangleMesh {
+        obj_file mesh/swimming-pool-ditch.obj
+    }
+    MaterialIndex 5
+    TriangleMesh {
+        obj_file mesh/swimming-pool-ladder.obj
+    }
+    MaterialIndex 6
+    TriangleMesh {
+        obj_file mesh/swimming-pool-water.obj
+    }
+}
+

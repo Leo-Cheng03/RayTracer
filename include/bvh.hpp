@@ -82,7 +82,9 @@ public:
                     );
 
         std::cout << "BVH tree built." << std::endl;
-        // PrintTree();
+        // if (objs.size() > 1000) {
+        //     PrintTree();
+        // }
     }
 
     ~BVH() {
@@ -95,7 +97,7 @@ public:
 
     BVHNode* Build(std::span<BVHObject> bvhObjects, int& totalNodes, int& offset);
     bool Intersect(const Ray& ray, Hit& hit, float tmin) const;
-    bool IntersectP(const Ray& ray,float tmin, float tmax) const;
+    bool IntersectP(const Ray& ray,float tmin, float tmax, const Object3D* ignore) const;
 
     void PrintNode(BVHNode* node, int depth) const {
         for (int i = 0; i < depth; i++) {

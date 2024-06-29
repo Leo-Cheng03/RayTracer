@@ -29,7 +29,8 @@ public:
         return true;
     }
 
-    bool intersectP(const Ray &r, float tmin, float tmax) const override {
+    bool intersectP(const Ray &r, float tmin, float tmax, const Object3D* ignore) const override {
+        if (ignore == this) return false;
         float nd = Vector3f::dot(normal, r.getDirection());
         if (nd == 0) return false;
         float t = (d - Vector3f::dot(normal, r.getOrigin())) / nd;

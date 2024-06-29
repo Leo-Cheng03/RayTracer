@@ -21,7 +21,7 @@
 SceneParser::SceneParser(const char *filename) {
 
     // initialize some reasonable default values
-    group = nullptr;
+    group = new Group();
     camera = nullptr;
     background_color = Vector3f(0.5, 0.5, 0.5);
     num_lights = 0;
@@ -220,14 +220,18 @@ Light *SceneParser::parseAreaLight() {
     getToken(token);
     assert (!strcmp(token, "{"));
     getToken(token);
+    assert (!strcmp(token, "mesh"));
+    getToken(token);
+    std::string meshFilename = token;
+    getToken(token);
     assert (!strcmp(token, "position"));
     Vector3f position = readVector3f();
     getToken(token);
-    assert (!strcmp(token, "direction"));
-    Vector3f direction = readVector3f();
+    assert (!strcmp(token, "right"));
+    Vector3f right = readVector3f().normalized();
     getToken(token);
     assert (!strcmp(token, "up"));
-    Vector3f up = readVector3f();
+    Vector3f up = readVector3f().normalized();
     getToken(token);
     assert (!strcmp(token, "size"));
     Vector2f size = readVector2f();
@@ -239,7 +243,18 @@ Light *SceneParser::parseAreaLight() {
     float scale = readFloat();
     getToken(token);
     assert (!strcmp(token, "}"));
-    return new AreaLight(position, direction, up, size, color, scale);
+    
+    Vector3f forward = Vector3f::cross(right, up);
+    Matrix4f translate = Matrix4f::translation(position);
+    Matrix4f scaleMatrix = Matrix4f::scaling(size[0], 1, size[1]);
+    Matrix4f rotation = Matrix4f(Vector4f(right, 0), Vector4f(up, 0), Vector4f(forward, 0), Vector4f(0, 0, 0, 1));
+    Material* material = new LightSourceMaterial(color, scale);
+    Object3D* mesh = new Mesh(meshFilename.c_str(), material); // TODO: add material
+    mesh = new Transform(translate * rotation * scaleMatrix, mesh);
+    std::cout << "before adding object\n";
+    group->addObject(group->getGroupSize(), mesh);
+    std::cout << "after adding object\n";
+    return new AreaLight(position, up, -forward, size, color, mesh, scale);
 }
 // ====================================================================
 // ====================================================================
@@ -337,6 +352,7 @@ Material *SceneParser::parseSpecularTransmissionMaterial()
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
     Vector3fSampler* albedo = nullptr;
+    Vector3fSampler* normalMap = nullptr;
     float eta = 1.0f;
     getToken(token);
     assert (!strcmp(token, "{"));
@@ -347,6 +363,9 @@ Material *SceneParser::parseSpecularTransmissionMaterial()
         } else if (strcmp(token, "albedoTexture") == 0) {
             getToken(filename);
             albedo = new Vector3fTexture(filename);
+        } else if (strcmp(token, "normalMap") == 0) {
+            getToken(filename);
+            normalMap = new Vector3fTexture(filename);
         } else if (strcmp(token, "eta") == 0) {
             eta = readFloat();
         } else {
@@ -354,7 +373,7 @@ Material *SceneParser::parseSpecularTransmissionMaterial()
             break;
         }
     }
-    auto *answer = new SpecularTransmissionMaterial(albedo, eta);
+    auto *answer = new SpecularTransmissionMaterial(albedo, normalMap, eta);
     return answer;
 }
 
@@ -474,7 +493,8 @@ Group *SceneParser::parseGroup() {
     assert (!strcmp(token, "numObjects"));
     int num_objects = readInt();
 
-    auto *answer = new Group(num_objects);
+    // auto *answer = new Group(num_objects);
+    auto *answer = group;
 
     // read in the objects
     int count = 0;

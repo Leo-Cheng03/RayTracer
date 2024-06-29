@@ -66,6 +66,9 @@ public:
         Vector2f uv = context.uv;
         int x = int(uv.x() * image->Width()) % image->Width();
         int y = int(uv.y() * image->Height()) % image->Height();
+        x = x < 0 ? x + image->Width() : x;
+        y = y < 0 ? y + image->Height() : y;
+        // std::cout << "uv: " << uv << " map to texture " << x << ", " << y << std::endl;
         return image->GetPixel(x, y);
     }
 

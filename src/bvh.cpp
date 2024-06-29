@@ -186,7 +186,7 @@ bool BVH::Intersect(const Ray &ray, Hit &hit, float tmin) const
     return isHit;
 }
 
-bool BVH::IntersectP(const Ray &ray, float tmin, float tmax) const
+bool BVH::IntersectP(const Ray &ray, float tmin, float tmax, const Object3D* ignore) const
 {
     Vector3f invDir = Vector3f(1.f / ray.getDirection().x(), 
                                1.f / ray.getDirection().y(), 
@@ -207,7 +207,7 @@ bool BVH::IntersectP(const Ray &ray, float tmin, float tmax) const
                 //     }
                 // }
                 for (const Object3D* obj : node->objects) {
-                    if (obj->intersectP(ray, tmin, tmax)) {
+                    if (obj->intersectP(ray, tmin, tmax, ignore)) {
                         return true;
                     }
                 }

@@ -23,6 +23,7 @@ public:
     }
 
     ~Transform() {
+        delete o;
     }
 
     virtual bool intersect(const Ray &r, Hit &h, float tmin) const {
@@ -47,11 +48,12 @@ public:
         return inter;
     }
 
-    virtual bool intersectP(const Ray& ray, float tmin, float tmax) const {
+    virtual bool intersectP(const Ray& ray, float tmin, float tmax, const Object3D* ignore) const {
+        if (ignore == this) return false;
         Vector3f trSource = transformPoint(transform, ray.getOrigin());
         Vector3f trDirection = transformDirection(transform, ray.getDirection());
         Ray tr(trSource, trDirection);
-        return o->intersectP(tr, tmin, tmax);
+        return o->intersectP(tr, tmin, tmax, ignore);
     }
 
     Bound3f Bounds() const {

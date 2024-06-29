@@ -55,8 +55,9 @@ public:
 		return true;
 	}
 
-	bool intersectP(const Ray& ray, float tmin, float tmax) const override {
-		// if (material->getBSDF()->IsTransparent()) return false;
+	bool intersectP(const Ray& ray, float tmin, float tmax, const Object3D* ignore) const override {
+		if (material->IsTransparent()) return false;
+		if (ignore == this) return false;
 		
 		Vector3f edge1, edge2;
 		Vector3f pvec, tvec, qvec;

@@ -21,7 +21,7 @@ Vector3f randomDirection() {
     return Vector3f(x, y, z).normalized();
 }
 
-Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& sampler, bool log, int depth) {
+Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& sampler, bool* hitLight, bool log, int depth) {
     if (depth > 10) return Vector3f::ZERO;
 
     Group* primitives = scene.getGroup();
@@ -49,44 +49,84 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
 
         // return hit.getBitangent() / 2 + Vector3f(0.5, 0.5, 0.5);
 
+        if (log) {
+            std::cout << "Hit at depth " << depth << std::endl;
+        }
+
         Vector3f hitPoint = ray.pointAtParameter(hit.getT());
         Vector3f normal = hit.getNormal();
         Vector3f wo = -ray.getDirection();
         Vector3f wi;
         MaterialSampleContext context(hit);
+
+        if (log) {
+            std::cout << "Hit info ok" << std::endl;
+            std::cout << "normal: " << context.normal << std::endl;
+            std::cout << "tangent: " << context.tangent << std::endl;
+            std::cout << "bitangent: " << context.bitangent << std::endl;
+        }
         
         Material* material = hit.getMaterial();
 
-        Vector3f wn = Vector3f::cross(wo, normal).normalized();
+        if (material->IsLightSource()) {
+            // std::cout << "emission: " << material->GetEmission() << std::endl;
+            if (hitLight) *hitLight = true;
+            return material->GetEmission() * Vector3f(0.5, 0.5, 0.5);
+        }
+
+        if (log) {
+            std::cout << "Material ok" << std::endl;
+            material->PrintName();
+            material->debug = true;
+        }
+
         Matrix3f tangentToWorld = material->GetTangentToWorld(context);
 
-        // return tangentToWorld * Vector3f::UP;
+        if (log) {
+            material->debug = false;
+            std::cout << "tangentToWorld: " << std::endl;
+            std::cout << tangentToWorld(0, 0) << " " << tangentToWorld(0, 1) << " " << tangentToWorld(0, 2) << std::endl;
+            std::cout << tangentToWorld(1, 0) << " " << tangentToWorld(1, 1) << " " << tangentToWorld(1, 2) << std::endl;
+            std::cout << tangentToWorld(2, 0) << " " << tangentToWorld(2, 1) << " " << tangentToWorld(2, 2) << std::endl;
+            std::cout << std::endl;
+        }
 
         Matrix3f worldToTangent = tangentToWorld.inverse();
+
+        if (log) {
+            std::cout << "Transform matrix ok" << std::endl;
+        }
 
         Vector3f localWo = (worldToTangent * wo).normalized();
 
         // Direct lighting
         // Sample a light based on power heuristic
-        Light* light = scene.getLight(
-            (int)(sampler.Get1D() * scene.getNumLights())
-        );
+        int lightIndex = (int)(sampler.Get1D() * scene.getNumLights());
+        lightIndex = std::min(lightIndex, scene.getNumLights() - 1);
+        Light* light = scene.getLight(lightIndex);
+
+        // if (log) { std::cout << "light ok: " << light << ", s = " << s << ", light num = " << lightNum << ", light index = " << lightIndex << std::endl; }
+
         LightSample ls;
         light->SampleLi(hitPoint, sampler.Get2D(), ls);
+
+        // if (log) { std::cout << "light sampling ok" << std::endl; }
+
         // Create a new ray from the intersection point to the light source
         Ray shadowRay(hitPoint, ls.wi);
         // Check if the new ray intersects with any object in the scene
         Vector3f localWi = (worldToTangent * ls.wi).normalized();
         float tmax = ls.distance;
 
+        // if (log) { std::cout << "direct wi ok" << std::endl; }
+
         if (log) {
-            std::cout << "Hit at depth " << depth << std::endl;
             std::cout << "Hit point: " << hitPoint << std::endl;
             std::cout << "Hit normal: " << normal << std::endl;
             std::cout << "Hit direction: " << -wo << std::endl;
         }
 
-        if (ls.pdf != 0 && !primitives->intersectP(shadowRay, 0.001f, tmax)) {
+        if (ls.pdf != 0 && (!primitives->intersectP(shadowRay, 0.001f, tmax, light->GetObject()))) {
             if (log) {
                 std::cout << "tangent: " << context.tangent << std::endl;
                 std::cout << "bitangent: " << context.bitangent << std::endl;
@@ -114,8 +154,14 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
         // Indirect lighting
         BSDFSample bs = material->Sample_f(localWo, context, sampler);
         if (bs.wi == Vector3f::ZERO) {
+            // finalColor = Vector3f(0, 1, 0);
             return finalColor;
         }
+
+        // if (bs.isSpecular) {
+        //     Vector3f sampleDir = (tangentToWorld * bs.wi).normalized();
+        //     return (sampleDir + Vector3f(1, 1, 1)) / 2;
+        // }
 
         Vector3f sampleDir = (tangentToWorld * bs.wi).normalized();
         Ray sampleRay(hitPoint, sampleDir);
@@ -132,12 +178,19 @@ Vector3f Integrator::SampleL(const SceneParser& scene, const Ray& ray, Sampler& 
             std::cout << "Sample ray: " << sampleRay << std::endl;
         }
 
-        Vector3f Li = SampleL(scene, sampleRay, sampler, log, depth + 1);
+        bool isLightSource = false;
+        Vector3f Li = SampleL(scene, sampleRay, sampler, &isLightSource, log, depth + 1);
+        if (isLightSource && !bs.isSpecular) {
+            return finalColor;
+            // finalColor *= 0.5f;
+            // Li = bs.isSpecular ? Li : Li / 2;
+        }
         float cosTheta = Vector3f::dot(normal, sampleDir);
         float absCosTheta = std::abs(cosTheta);
         // finalColor += bs.f * Li / bs.pdf;
         // finalColor += (sampleDir + Vector3f(1, 1, 1)) / 2;
         finalColor += bs.f * Li * (bs.isSpecular ? 1 : absCosTheta) / bs.pdf;
+        // finalColor = Vector3f(1, 0, 0);
         // The cosine term is cancelled out when calculating the pdf on a specular surface
         // https://computergraphics.stackexchange.com/questions/13250/cosine-term-in-rendering-equation
     }

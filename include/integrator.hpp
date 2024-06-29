@@ -11,7 +11,7 @@ public:
     Integrator() {}
     ~Integrator() {}
 
-    Vector3f SampleL(const SceneParser& scene, const Ray& ray, Sampler& sampler, bool log, int depth = 0);
+    Vector3f SampleL(const SceneParser& scene, const Ray& ray, Sampler& sampler, bool* hitLight, bool log, int depth = 0);
 };
 
 #endif

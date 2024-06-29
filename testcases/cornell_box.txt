@@ -11,12 +11,13 @@ PerspectiveCamera {
 Lights {
     numLights 1
     AreaLight {
+        mesh mesh/plane.obj
         position 0 7.9 0
-        direction 0 -1 0
-        up 0 0 1
-        size 1 1
+        right 1 0 0
+        up 0 -1 0
+        size 2 2
         color 1 1 1
-        scale 200
+        scale 50
     }
 }
 
@@ -25,7 +26,7 @@ Background {
 }
 
 Materials {
-    numMaterials 7
+    numMaterials 8
     Diffuse { 
         albedo 0.65 0.05 0.05 
         normalMap textures/brick_wall_nor_1k.bmp
@@ -53,10 +54,14 @@ Materials {
         albedoTexture textures/brick_wall_diff_1k.bmp
         normalMap textures/brick_wall_nor_1k.bmp
     }
+    Metalic {
+        albedo 1.0 1.0 1.0
+        roughness 0.1
+    }
 }
 
 Group {
-    numObjects 8
+    numObjects 9
     MaterialIndex 0
     Transform {
         Translate -5 4 0
@@ -97,19 +102,24 @@ Group {
             obj_file mesh/cube_with_uv.obj
         }
     }
-    MaterialIndex 3
+    MaterialIndex 7
     Sphere {
         center -2 1.25 1
         radius 1.25
     }
     MaterialIndex 4
     Sphere {
-        center 0 1.25 -1
+        center 0 2.5 0.25
         radius 1.25
     }
     MaterialIndex 5
     Sphere {
         center 2 1.25 1
+        radius 1.25
+    }
+    MaterialIndex 3
+    Sphere {
+        center 0 1.25 2
         radius 1.25
     }
 }

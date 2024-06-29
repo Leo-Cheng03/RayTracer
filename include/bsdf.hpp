@@ -100,25 +100,25 @@ struct BSDFSample {
 
 class GGXDistribution {
 public:
-    GGXDistribution(float alphaX, float alphaY) : 
-        alphaX(alphaX), alphaY(alphaY) {}
+    GGXDistribution(float alphaX, float alphaZ) : 
+        alphaX(alphaX), alphaZ(alphaZ) {}
     
     Vector3f Sample_wm(const Vector3f& w, const Vector2f& u) const {
-        Vector3f wh = Vector3f(alphaX * w.x(), alphaY * w.y(), w.z()).normalized();
-        if (wh.z() < 0) wh = -wh;
+        Vector3f wh = Vector3f(alphaX * w.x(), w.y(), alphaZ * w.z()).normalized();
+        if (wh.y() < 0) wh = -wh;
 
-        Vector3f T1 = (wh.z() < 0.9999f) ? Vector3f::cross(Vector3f::UP, wh).normalized() : 
+        Vector3f T1 = (wh.y() < 0.9999f) ? Vector3f::cross(Vector3f::UP, wh).normalized() : 
                                            Vector3f::RIGHT;
         Vector3f T2 = Vector3f::cross(wh, T1);
 
         Vector2f p = SampleUniformDiskPolar(u);
 
         float h = std::sqrt(1 - p.x() * p.x());
-        p.y() = _Lerp((1 + wh.z()) / 2, h, p.y());
+        p.y() = _Lerp((1 + wh.y()) / 2, h, p.y());
 
         float pz = std::sqrt(std::max<float>(0, 1 - p.lengthSquared()));
         Vector3f nh = p.x() * T1 + p.y() * T2 + pz * wh;
-        return Vector3f(alphaX * nh.x(), alphaY * nh.y(), std::max<float>(1e-6f, nh.z())).normalized();
+        return Vector3f(alphaX * nh.x(), std::max<float>(1e-6f, nh.y()), alphaZ * nh.z()).normalized();
     }
 
     float D(const Vector3f& wm, bool debug = false) const {
@@ -126,7 +126,7 @@ public:
         if (std::isinf(tanSquaredTheta)) return 0;
         float cos4Theta = CosSquaredTheta(wm) * CosSquaredTheta(wm);
         float e = tanSquaredTheta * ((CosPhi(wm) / alphaX) * (CosPhi(wm) / alphaX) + 
-                                     (SinPhi(wm) / alphaY) * (SinPhi(wm) / alphaY));
+                                     (SinPhi(wm) / alphaZ) * (SinPhi(wm) / alphaZ));
         
         if (debug) {
             std::cout << "wm: " << wm << std::endl;
@@ -135,7 +135,7 @@ public:
             std::cout << "e: " << e << std::endl;
         }
 
-        return 1 / (M_PI * alphaX * alphaY * cos4Theta * (1 + e) * (1 + e));
+        return 1 / (M_PI * alphaX * alphaZ * cos4Theta * (1 + e) * (1 + e));
     }
 
     float D(const Vector3f& w, const Vector3f& wm) const {
@@ -147,14 +147,14 @@ public:
     }
 
     bool EffectivelySmooth() const {
-        return std::max(alphaX, alphaY) < 1e-3;
+        return std::max(alphaX, alphaZ) < 1e-3;
     }
 
     float Lambda(const Vector3f& w) const {
         float tanSquaredTheta = TanSquaredTheta(w);
         if (std::isinf(tanSquaredTheta)) return 0;
         float alphaSquared = CosPhi(w) * CosPhi(w) * alphaX * alphaX + 
-                       SinPhi(w) * SinPhi(w) * alphaY * alphaY;
+                       SinPhi(w) * SinPhi(w) * alphaZ * alphaZ;
         return (std::sqrt(1 + alphaSquared * tanSquaredTheta) - 1) / 2;
     }
 
@@ -167,7 +167,7 @@ public:
     }
 
 private:
-    float alphaX, alphaY;
+    float alphaX, alphaZ;
 };
 
 // class BSDF {

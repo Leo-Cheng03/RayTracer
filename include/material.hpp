@@ -32,6 +32,18 @@ public:
         std::cout << "Unnamed Material" << std::endl;
     }
 
+    virtual bool IsLightSource() const {
+        return false;
+    }
+
+    virtual bool IsTransparent() const {
+        return false;
+    }
+
+    virtual Vector3f GetEmission() const {
+        return Vector3f::ZERO;
+    }
+
     bool debug = false;
 };
 
@@ -67,13 +79,26 @@ public:
 
     Matrix3f GetTangentToWorld(const MaterialSampleContext& context) override {
         Matrix3f tangentToWorld = Material::GetTangentToWorld(context);
+        if (debug) {
+            std::cout << "context: " << std::endl;
+            std::cout << "uv: " << context.uv << std::endl;
+        }
         Vector3f xzy = normalMap->Sample(context);
         Vector3f normal = {xzy.x(), xzy.z(), xzy.y()};
-        normal = (normal * 2 - Vector3f(1, 1, 1)).normalized();
+
+        if (normal == Vector3f::ZERO) {
+            normal = Vector3f::UP;
+        } else {
+            normal = (normal * 2 - Vector3f(1, 1, 1)).normalized();
+        }
         normal = tangentToWorld * normal;
+
+        if (debug) {
+            std::cout << "normal: " << normal << std::endl;
+        }
         
         Vector3f tangent;
-        if (normal == Vector3f::UP) {
+        if (normal.y() >= 0.9999f) {
             tangent = Vector3f::RIGHT;
         } else {
             tangent = Vector3f::cross(Vector3f::UP, normal).normalized();
@@ -236,10 +261,22 @@ public:
         albedo(new Vector3fTexture(albedo)), eta(eta) {}
 
     SpecularTransmissionMaterial(Vector3fSampler* albedo, float eta) : 
-        albedo(albedo), eta(eta) {}
+        albedo(albedo), eta(eta) {
+            normalMap = new Vector3fConstant(Vector3f(0.5, 0.5, 1.0));
+    }
+
+    SpecularTransmissionMaterial(Vector3fSampler* albedo, Vector3fSampler* normalMap, float eta) : 
+        albedo(albedo), normalMap(normalMap), eta(eta) {
+            if (normalMap == nullptr) {
+                normalMap = new Vector3fConstant(Vector3f(0.5, 0.5, 1.0));
+                std::cout << "normal map is null" << std::endl;
+                std::cout << normalMap << std::endl;
+            }
+        }
 
     ~SpecularTransmissionMaterial() {
         delete albedo;
+        delete normalMap;
     }
 
     Vector3f f(const Vector3f& wo, const Vector3f& wi, const MaterialSampleContext& context) override {
@@ -265,12 +302,52 @@ public:
         return result;
     }
 
+    Matrix3f GetTangentToWorld(const MaterialSampleContext& context) override {
+        Matrix3f tangentToWorld = Material::GetTangentToWorld(context);
+        if (normalMap == nullptr) {
+            normalMap = new Vector3fConstant(Vector3f(0.5, 0.5, 1.0));
+        }
+        if (debug) {
+            std::cout << "context: " << std::endl;
+            std::cout << "uv: " << context.uv << std::endl;
+            std::cout << "normal map: " << normalMap << std::endl;
+        }
+        Vector3f xzy = normalMap->Sample(context);
+        Vector3f normal = {xzy.x(), xzy.z(), xzy.y()};
+
+        if (normal == Vector3f::ZERO) {
+            normal = Vector3f::UP;
+        } else {
+            normal = (normal * 2 - Vector3f(1, 1, 1)).normalized();
+        }
+        normal = tangentToWorld * normal;
+
+        if (debug) {
+            std::cout << "normal: " << normal << std::endl;
+        }
+        
+        Vector3f tangent;
+        if (normal.y() >= 0.9999f) {
+            tangent = Vector3f::RIGHT;
+        } else {
+            tangent = Vector3f::cross(Vector3f::UP, normal).normalized();
+        }
+        Vector3f bitangent = Vector3f::cross(normal, tangent).normalized();
+
+        return Matrix3f(context.tangent, normal, context.bitangent);
+    }
+
     void PrintName() override {
         std::cout << "Specular Transmission Material" << std::endl;
     }
 
+    bool IsTransparent() const override {
+        return true;
+    }
+
 private:
     Vector3fSampler* albedo;
+    Vector3fSampler* normalMap;
     float eta;
 };
 
@@ -306,6 +383,36 @@ private:
     Material* material1;
     Material* material2;
     FloatSampler* ratio;
+};
+
+class LightSourceMaterial : public Material {
+public:
+    LightSourceMaterial(const Vector3f& color, float scale) : 
+        color(color), scale(scale) {}
+
+    Vector3f f(const Vector3f& wo, const Vector3f& wi, const MaterialSampleContext& context) override {
+        return Vector3f::ZERO;
+    }
+
+    BSDFSample Sample_f(const Vector3f& wo, const MaterialSampleContext& context, Sampler& sampler) override {
+        return BSDFSample();
+    }
+
+    void PrintName() override {
+        std::cout << "Light Source Material" << std::endl;
+    }
+
+    Vector3f GetEmission() const override{
+        return color * scale;
+    }
+
+    bool IsLightSource() const override {
+        return true;
+    }
+
+private:
+    Vector3f color;
+    float scale;
 };
 
 #endif // MATERIAL_H

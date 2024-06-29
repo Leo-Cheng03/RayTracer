@@ -29,7 +29,7 @@ public:
     std::vector<TriangleIndex> tex;
     std::vector<Vector3f> n;
     bool intersect(const Ray &r, Hit &h, float tmin) const override;
-    bool intersectP(const Ray &r, float tmin, float tmax) const override;
+    bool intersectP(const Ray &r, float tmin, float tmax, const Object3D* ignore) const override;
     Bound3f Bounds() const override;
 
 private:

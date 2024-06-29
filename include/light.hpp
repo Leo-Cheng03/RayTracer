@@ -17,7 +17,7 @@ struct LightSample {
 
 class Light {
 public:
-    Light(float s = 0.0f) : scale(s) {}
+    Light(float s = 0.0f, Object3D* obj = nullptr) : scale(s), object(obj) {}
 
     virtual ~Light() = default;
 
@@ -30,8 +30,13 @@ public:
         return Vector3f::ZERO;
     }
 
+    virtual Object3D* GetObject() {
+        return object;
+    }
+
 protected:
     float scale;
+    Object3D* object;
 };
 
 
@@ -105,7 +110,7 @@ class AreaLight : public Light {
 public:
     AreaLight() = delete;
 
-    AreaLight(const Vector3f &p, const Vector3f& dir, const Vector3f& up, const Vector2f size, const Vector3f &c, float s = 0.0f) : Light(s) {
+    AreaLight(const Vector3f &p, const Vector3f& dir, const Vector3f& up, const Vector2f size, const Vector3f &c, Object3D* mesh, float s = 0.0f) : Light(s, mesh) {
         this->position = p;
         this->color = c;
         this->direction = dir.normalized();

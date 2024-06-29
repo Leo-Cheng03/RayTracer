@@ -49,14 +49,19 @@ public:
         if (t2 > tmin && t2 < h.getT()) {
             Vector3f normal = r.pointAtParameter(t2) - center;
             normal.normalize();
-            h.set(t2, material, normal);
+            Vector3f tangent = (normal.y() < 0.999f) ? Vector3f::cross(Vector3f::UP, normal) :
+                                                       Vector3f::cross(Vector3f::RIGHT, normal);
+            Vector3f bitangent = Vector3f::cross(normal, tangent);
+            h.set(t2, material, normal, Vector2f(0, 0), tangent, bitangent);
             return true;
         }
 
         return false;
     }
 
-    bool intersectP(const Ray& ray, float tmin, float tmax) const override {
+    bool intersectP(const Ray& ray, float tmin, float tmax, const Object3D* ignore) const override {
+        if (ignore == this) return false;
+        
         float a = ray.getDirection().squaredLength();
         float b = 2 * Vector3f::dot(ray.getDirection(), ray.getOrigin() - center);
         float c = (ray.getOrigin() - center).squaredLength() - radius * radius;
@@ -71,7 +76,6 @@ public:
         if (t1 > tmin) return true;
 
         float t2 = (-b + sqrt(delta)) / (2 * a);
-
         return t2 > tmin && t2 < tmax;
     }
 

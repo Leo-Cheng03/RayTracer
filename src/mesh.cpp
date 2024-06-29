@@ -13,8 +13,12 @@ bool Mesh::intersect(const Ray &r, Hit &h, float tmin) const {
     return result;
 }
 
-bool Mesh::intersectP(const Ray &r, float tmin, float tmax) const {
-    return bvh->IntersectP(r, tmin, tmax);
+bool Mesh::intersectP(const Ray &r, float tmin, float tmax, const Object3D* target) const {
+    if (bvh->IntersectP(r, tmin, tmax, target)) {
+        target = this;
+        return true;
+    }
+    return false;
 }
 
 Bound3f Mesh::Bounds() const {
